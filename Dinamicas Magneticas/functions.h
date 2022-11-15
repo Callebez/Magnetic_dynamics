@@ -1,10 +1,5 @@
 #pragma once
 #include "matrices.h"
-struct coord
-{
-	std::vector<double> x;
-	double t;
-};
 class function
 {
 	private:
