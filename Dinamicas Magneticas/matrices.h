@@ -33,5 +33,6 @@ class matrix
 		static double inner_prod(std::vector<double>& v, std::vector<double>& u);
 		static std::vector<double> sub_vectors(std::vector<double>& v, std::vector<double>u);
 		static std::vector<double> sum_vectors(std::vector<double>& v, std::vector<double>u);
+		static std::vector<double> axpy(std::vector<double>& x, std::vector<double>& y, double a);
 };
 

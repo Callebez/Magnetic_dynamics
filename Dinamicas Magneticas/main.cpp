@@ -1,25 +1,49 @@
 #include <iostream>
+#include<fstream>
 #include "matrices.h"
+#include "functions.h"
+void plot3D(const char* fileName, const char* inputFile, const char* systemName, const char* keys)
+{
+	FILE* gnupipe = _popen("gnuplot -persist", "w");
+	if (gnupipe)
+	{
+		fprintf_s(gnupipe,"set terminal pngcairo enhanced size 1080,720 font \'Heveltica, 15\ '\n\n");
+		fprintf_s(gnupipe, "set title \"%s \" font \'Helvetica, 16\' \n\n ", systemName);
+		fprintf_s(gnupipe, "set tics font \'Helvetica, 14\' \n\n");
+		fprintf_s(gnupipe, "set border lw 3 \n \n");
+		fprintf_s(gnupipe, "set key opaque \n\n");
+		fprintf_s(gnupipe,"set output \'%s.png\'\n", fileName);
+		fprintf_s(gnupipe, "splot \'%s.txt\' u 2:3:4 w lines lw 0.5 lc 7 title \'%s\'\n", fileName, keys);
+	}
 
+}
+void printMatrixToFile(std::vector<std::pair<std::vector<double>, double>>& matrix, std::string fileName)
+{
+	std::ofstream output;
+	
+	output.open(fileName);
+	for (auto i : matrix)
+	{
+		output << i.second;
+		for (unsigned int j = 0; j < i.first.size(); j++)
+		{
+			output << " " << i.first[j];
+		}
+		output << std::endl;
+	}
+	output.close();
+	std::cout << fileName;
+}
 int main(void)
 {
-	unsigned int nrows= 2, ncolumns=2;
-	matrix M(nrows, ncolumns);
-	M.set_value(0, 0, 2);
-	M.set_value(0, 1, 1);
-	//M.set_value(0, 2, 4);
-	M.set_value(1, 0, 0);
-	M.set_value(1, 1, 1);
-	//M.set_value(1, 2, 1);
-	M.print_matrix();
-	matrix A = matrix::mult_matrix(M, M);
-	A.print_matrix();
-	std::vector<double> v = { 0, 1 };
-	std::vector<double> a = matrix::apply_matrix(A, v);
+
+	std::vector<double> params = {1.0,50};
+
+	function f(function::pendulum, params, 2, 2);
+	std::vector<double> x = { 2,0};
 	
-	matrix::print_vector(a);
-
-
+	std::vector<std::pair<std::vector<double>, double>> y = function::runge_kutta4th(f, make_pair(x, 0), 300, 0.01);
+	printMatrixToFile(y, "pendulum.txt");
 
 	return 0;
 }

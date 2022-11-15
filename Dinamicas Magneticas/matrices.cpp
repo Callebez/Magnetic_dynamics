@@ -193,3 +193,12 @@ double matrix::distance(std::vector<double>& v, std::vector<double>& u)
 	std::vector<double> a = sub_vectors(v, u);
 	return norm(a);
 }
+std::vector<double> matrix:: axpy(std::vector<double>& x, std::vector<double>& y, double a)
+{
+	std::vector<double> res(x.size());
+	for (unsigned int i = 0; i < x.size(); i++)
+	{
+		res[i] = a * x[i] + y[i];
+	}
+	return res;
+}
