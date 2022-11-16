@@ -34,16 +34,18 @@ void printMatrixToFile(std::vector<std::pair<std::vector<double>, double>>& matr
 	output.close();
 	std::cout << fileName;
 }
+
 int main(void)
 {
 
-	std::vector<double> params = {1.0,50};
+	std::vector<double> params = {9.8,1.0, 100.0};
 
-	function f(function::pendulum, params, 2, 2);
-	std::vector<double> x = { 2,0};
+	function f(function::sistemaAmigos, params, 2, 2);
+	std::vector<double> x = { 10.0,0.000};
 	
-	std::vector<std::pair<std::vector<double>, double>> y = function::runge_kutta4th(f, make_pair(x, 0), 300, 0.01);
-	printMatrixToFile(y, "pendulum.txt");
+	std::vector<std::pair<std::vector<double>, double>> y = function::runge_kutta4th(f, make_pair(x, 0), 100, 0.01);
+
+	printMatrixToFile(y, "amigos.txt");
 
 	return 0;
 }

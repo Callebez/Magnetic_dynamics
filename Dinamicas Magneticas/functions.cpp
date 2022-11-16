@@ -15,6 +15,13 @@ std::vector<double> function::lorenz_equation(std::pair<std::vector<double>, dou
     
 	return x_dot;
 }
+std::vector<double> function::sistemaAmigos(std::pair<std::vector<double>, double>x, std::vector<double> param)
+{
+    std::vector<double> x_dot(2);
+    x_dot[0] = x.first[1];
+    x_dot[1] = -param[0] + param[2]*sin(param[1]*x.second)*x.first[1];
+    return x_dot;
+}
 std::vector<double> function::pendulum(std::pair<std::vector<double>, double>x, std::vector<double> param)
 {
     std::vector<double> x_dot(2);
