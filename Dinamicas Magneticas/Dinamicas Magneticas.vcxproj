@@ -24,6 +24,7 @@
     <ProjectGuid>{cabc5a38-f37a-450e-9582-080846ad1acb}</ProjectGuid>
     <RootNamespace>DinamicasMagneticas</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>Magnetic Dynamics</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
