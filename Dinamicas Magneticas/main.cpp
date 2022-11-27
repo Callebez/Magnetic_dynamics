@@ -24,9 +24,9 @@ int main(void)
 	std::vector<double> pendulumParams = { 1.0,2.5};
 	function pendulum = function(function::pendulum, pendulumParams, 2);
 	std::vector<std::pair<std::vector<double>, double>> y = pendulum.runge_kutta4th(make_pair(x, 0), 100, 0.001);
-	matrix::printMatrixToFile(y, "pendulum.txt");
+	matrix::printMatrixToFile(y, "./Dat/dipole_001_f2.5.txt");
 
-	plotting::plot2D("pendulum_b2.5", "pendulum", "Magnetic dipole in an osciling magnectic field with frequency of 2.5", "1:2");
+	plotting::plot2D("dipole_001_f2.5", "./Dat/dipole_001_f2.5", "Magnetic dipole in an osciling magnectic field with frequency of 2.5", "1:2");
 	auto stop = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 	std::cout << "\n Time taken by function: " << duration.count() << " miliseconds" << "\n";
