@@ -142,6 +142,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="functions.cpp" />
+    <ClCompile Include="integration.cpp" />
     <ClCompile Include="lyapunov.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="matrices.cpp" />
@@ -149,6 +150,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="functions.h" />
+    <ClInclude Include="integration.h" />
     <ClInclude Include="lyapunov.h" />
     <ClInclude Include="matrices.h" />
     <ClInclude Include="plotting.h" />

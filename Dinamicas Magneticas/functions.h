@@ -19,9 +19,12 @@ class function
 		std::vector<std::pair<std::vector<double>, double>> runge_kutta4th(std::pair<std::vector<double>, double> x, double tf, double h);
 
 		static std::vector<double> lorenz_equation(std::pair<std::vector<double>, double>x, std::vector<double> param);
-		static std::vector<double> pendulum(std::pair<std::vector<double>, double>x, std::vector<double> param);
+		static std::vector<double> magenticDipole(std::pair<std::vector<double>, double>x, std::vector<double> param);
 		static std::vector<double> sistemaAmigos(std::pair<std::vector<double>, double>x, std::vector<double> param);
-		//std::vector<long double> lyapunov(std::vector<std::vector<double>>(*jacobian)(std::pair<std::vector<double>, double>), std::pair<std::vector<double>, double> x, double tf, double step);
+		static std::complex<double> simpsonOneThird(std::vector<std::complex<double>>f, double t0, double tf);
+		static std::vector <std::complex<double>> fourierTransform(std::vector<std::pair<std::vector<double>, double>> f, double w);
+
+		static std::vector<std::pair<std::vector<double>, double>> func_test(unsigned n_points, double t0, double tf);
 
 
 };

@@ -1,17 +1,17 @@
 #pragma once
 #include <vector>
-#include<cstdint>
-#include<fstream>
-#include<iostream>
-
+#include <cstdint>
+#include <fstream>
+#include <iostream>
+#include <complex>
+#include <cmath>
 class matrix
 {
 	private:
 		unsigned int rows, columns;
-		//double** data;
+		std::vector<std::vector<double>> data;
 
 	public:
-		std::vector<std::vector<double>> data;
 
 		matrix(unsigned int nrows, unsigned int ncolumns);
 		
@@ -38,17 +38,9 @@ class matrix
 		static std::vector<double> sub_vectors(std::vector<double>& v, std::vector<double>u);
 		static std::vector<double> sum_vectors(std::vector<double>& v, std::vector<double>u);
 		static std::vector<double> axpy(std::vector<double>& x, std::vector<double>& y, double a);
-		static std::vector<double> proj_UV(std::vector<double> vectorV, std::vector<double> vectorU);
-		static std::vector<double> sum_projections(unsigned int position, std::vector<std::vector<double>>& matrix);
+		static std::vector<double> ax(std::vector<double>& x, double a);
 		static matrix identityMatrix(unsigned int order);
-
-		void gram_schmidt();
-		void gram_schmidt_normal();
 		static void printMatrixToFile(std::vector<std::pair<std::vector<double>, double>>& matrix, std::string fileName);
-
-
-
-
 
 	};
 

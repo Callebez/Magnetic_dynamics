@@ -22,7 +22,7 @@ std::vector<double> function::sistemaAmigos(std::pair<std::vector<double>, doubl
     x_dot[1] = -param[0] + param[1]*x.first[0]*x.first[1];
     return x_dot;
 }
-std::vector<double> function::pendulum(std::pair<std::vector<double>, double>x, std::vector<double> param)
+std::vector<double> function::magenticDipole(std::pair<std::vector<double>, double>x, std::vector<double> param)
 {
     std::vector<double> x_dot(2);
     x_dot[0] = x.first[1];
@@ -58,4 +58,54 @@ std::vector<std::pair<std::vector<double>, double>> function::runge_kutta4th(std
         res[i+1] = std::make_pair(runge_kutta_step(res[i], h), res[i].second + h);
     }
     return res;
+}
+std::vector<std::pair<std::vector<double>, double>> function::func_test(unsigned n_points, double t0, double tf)
+{
+    std::vector<std::pair<std::vector<double>, double>> f(n_points+1);
+    double t = t0;
+    double h = (tf-t0)/n_points;
+    std::vector<double> x(1);
+    for (unsigned int i = 0; i < n_points+1; i++)
+    {
+
+        x = {sin(2.0*t)};
+        f[i] = std::make_pair(x, t); 
+        t += h;
+        x.clear();
+    }
+    return f;
+}
+std::complex<double> complexExp(double w, double t)
+{
+    return std::complex<double>(cos(w * t), -sin(w * t));
+}
+std::complex<double> multiRealByComplex(std::complex<double> z, double x)
+{
+    return std::complex<double>(z.real() * x, z.imag() * x);
+}
+std::vector<std::complex<double>> function::fourierTransform(std::vector<std::pair<std::vector<double>, double>> f,double w)
+{
+    unsigned int n = f.size();
+    std::vector<std::complex<double>> fexp(n);
+    for (unsigned int i = 0; i < n; i ++)
+    {
+        fexp[i] = multiRealByComplex(complexExp(w, f[i].second), f[i].first[0]);
+    }
+    return fexp;
+}
+std::complex<double> function::simpsonOneThird(std::vector<std::complex<double>> f,double t0,double tf)
+{
+    unsigned int n;
+    if (f.size() % 2 != 0) { n = f.size() - 1; }
+    else { n = f.size();}
+    std::complex<double> h = (tf - t0) / (double)f.size();
+    std::complex<double> sum = {0.0, 0.0};
+    sum += f[0]*h/3.0;
+    sum += f.back()* h / 3.0;
+    for (unsigned int i = 1; i < int((n-1)/2); i++)
+    {
+        sum += f[2 * i - 1] * 4.0 * h / 3.0;
+        sum += f[2 * i]* 2.0 * h / 3.0;
+    }
+    return sum;
 }

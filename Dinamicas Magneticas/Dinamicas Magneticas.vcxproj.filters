@@ -30,6 +30,9 @@
     <ClCompile Include="plotting.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="integration.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="functions.h">
@@ -42,6 +45,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="plotting.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="integration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

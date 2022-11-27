@@ -10,7 +10,6 @@ matrix::matrix(unsigned int nrows, unsigned int ncolumns)
 		i = column;
 	}
 	data = elements;
-
 }
 unsigned int matrix::get_rows()
 {
@@ -22,18 +21,34 @@ unsigned int matrix::get_columns()
 }
 double matrix::get_value(unsigned int row_position, unsigned int column_position)
 {
+	if (row_position > rows || column_position > columns)
+	{
+		throw std::invalid_argument("Invalid row/column entrance!");
+	}
 	return data[row_position][column_position];
 }
 void matrix::set_rows(unsigned int new_nrows)
 {
+	if (new_nrows == 0)
+	{
+		throw std::invalid_argument("number of rows cannot be zero!");
+	}
 	rows = new_nrows;
 }
 void matrix::set_columns(unsigned int new_ncolumns)
 {
+	if (new_ncolumns == 0)
+	{
+		throw std::invalid_argument("number of columns cannot be zero!");
+	}
 	columns = new_ncolumns;
 }
 void matrix::print_matrix()
 {
+	if (rows == NULL || columns == NULL)
+	{
+		throw std::invalid_argument("Invalid matrix!");
+	}
 	for (unsigned int i = 0; i < get_rows(); i++)
 	{
 		for (unsigned int j = 0; j < get_columns(); j++)
@@ -59,7 +74,6 @@ std::vector<double> matrix::apply_matrix(matrix& A, std::vector<double>& v)
 		{
 			sum += A.get_value(i,j) * v[j];
 		}
-		// std::cout<<soma<<"\n";
 		res[i] = sum;
 	}
 	return res;
@@ -205,6 +219,15 @@ std::vector<double> matrix:: axpy(std::vector<double>& x, std::vector<double>& y
 	}
 	return res;
 }
+std::vector<double> matrix::ax(std::vector<double>& x, double a)
+{
+	std::vector<double> res(x.size());
+	for (unsigned int i = 0; i < x.size(); i++)
+	{
+		res[i] = a * x[i];
+	}
+	return res;
+}
 
 matrix matrix::copy_matrix()
 {
@@ -258,5 +281,4 @@ void matrix :: printMatrixToFile(std::vector<std::pair<std::vector<double>, doub
 		output << std::endl;
 	}
 	output.close();
-	std::cout << fileName;
 }
