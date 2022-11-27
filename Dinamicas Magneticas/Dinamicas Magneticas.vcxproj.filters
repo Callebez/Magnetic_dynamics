@@ -24,12 +24,24 @@
     <ClCompile Include="matrices.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="lyapunov.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="plotting.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="functions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="matrices.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lyapunov.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="plotting.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

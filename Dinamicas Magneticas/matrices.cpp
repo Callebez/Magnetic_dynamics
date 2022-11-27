@@ -2,12 +2,15 @@
 matrix::matrix(unsigned int nrows, unsigned int ncolumns)
 {
 	rows = nrows;
-	columns = ncolumns;
-	data = new double* [rows];
-	for (unsigned int i = 0; i < rows; i++)
+	columns = ncolumns;	 
+	std::vector<std::vector<double>> elements(rows);
+	for (auto& i : elements)
 	{
-		data[i] = new double[columns];
+		std::vector<double> column(columns);
+		i = column;
 	}
+	data = elements;
+
 }
 unsigned int matrix::get_rows()
 {
@@ -174,7 +177,7 @@ std::vector<double> matrix::sub_vectors(std::vector<double>& v, std::vector<doub
 	return res;
 }
 // Euclidian inner product
-double matrix::inner_prod(std::vector<double>& v, std::vector<double>& u)
+double matrix::dotProduct(std::vector<double>& v, std::vector<double>& u)
 {
 	if (v.size() != u.size())
 	{
@@ -187,7 +190,7 @@ double matrix::inner_prod(std::vector<double>& v, std::vector<double>& u)
 	}
 	return prod;
 }
-double matrix::norm(std::vector<double>& v){ return sqrt(inner_prod(v, v)); }
+double matrix::norm(std::vector<double>& v){ return sqrt(dotProduct(v, v)); }
 double matrix::distance(std::vector<double>& v, std::vector<double>& u)
 {
 	std::vector<double> a = sub_vectors(v, u);
@@ -201,4 +204,59 @@ std::vector<double> matrix:: axpy(std::vector<double>& x, std::vector<double>& y
 		res[i] = a * x[i] + y[i];
 	}
 	return res;
+}
+
+matrix matrix::copy_matrix()
+{
+	matrix v = matrix(rows, columns);
+	for (unsigned int i = 0; i < rows; i++)
+	{
+		for (unsigned int j = 0; j < columns; j++)
+		{
+			v.data[i, j] = data[i, j];
+		}
+	}
+	return v;
+}
+
+matrix matrix::identityMatrix(unsigned int order)
+{
+	matrix id = matrix(order, order);
+	for (unsigned int i = 0; i < order; i++)
+	{
+		for (unsigned int j = 0; j < order; j++)
+		{
+			id.data[i][j] = 0;
+		}
+		id.data[i][i] = 1;
+	}
+	return id;
+}
+void matrix::transpose()
+{
+	matrix aux = copy_matrix();
+	for (unsigned int i = 0; i < rows; i++)
+	{
+		for (unsigned int j = 0; j < columns; j++)
+		{
+			data[i][j] = aux.data[j][i];
+		}
+	}
+}
+void matrix :: printMatrixToFile(std::vector<std::pair<std::vector<double>, double>>& matrix, std::string fileName)
+{
+	std::ofstream output;
+
+	output.open(fileName);
+	for (auto i : matrix)
+	{
+		output << i.second;
+		for (unsigned int j = 0; j < i.first.size(); j++)
+		{
+			output << " " << i.first[j];
+		}
+		output << std::endl;
+	}
+	output.close();
+	std::cout << fileName;
 }

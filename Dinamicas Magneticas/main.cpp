@@ -1,51 +1,35 @@
 #include <iostream>
 #include<fstream>
+#include<chrono>
+#include<cstdlib>
 #include "matrices.h"
 #include "functions.h"
-void plot3D(const char* fileName, const char* inputFile, const char* systemName, const char* keys)
-{
-	FILE* gnupipe = _popen("gnuplot -persist", "w");
-	if (gnupipe)
-	{
-		fprintf_s(gnupipe,"set terminal pngcairo enhanced size 1080,720 font \'Heveltica, 15\ '\n\n");
-		fprintf_s(gnupipe, "set title \"%s \" font \'Helvetica, 16\' \n\n ", systemName);
-		fprintf_s(gnupipe, "set tics font \'Helvetica, 14\' \n\n");
-		fprintf_s(gnupipe, "set border lw 3 \n \n");
-		fprintf_s(gnupipe, "set key opaque \n\n");
-		fprintf_s(gnupipe,"set output \'%s.png\'\n", fileName);
-		fprintf_s(gnupipe, "splot \'%s.txt\' u 2:3:4 w lines lw 0.5 lc 7 title \'%s\'\n", fileName, keys);
-	}
+#include <ctime>
+#include "plotting.h"
 
-}
-void printMatrixToFile(std::vector<std::pair<std::vector<double>, double>>& matrix, std::string fileName)
-{
-	std::ofstream output;
-	
-	output.open(fileName);
-	for (auto i : matrix)
-	{
-		output << i.second;
-		for (unsigned int j = 0; j < i.first.size(); j++)
-		{
-			output << " " << i.first[j];
-		}
-		output << std::endl;
-	}
-	output.close();
-	std::cout << fileName;
-}
 
 int main(void)
 {
+	auto start = std::chrono::high_resolution_clock::now();
+	std::srand(time(0));
 
-	std::vector<double> params = {9.8,1.0, 100.0};
+	//std::vector<double> x = { 1.0,0.01,0.1};
+	//std::vector<double> lorenzParams = {10.0,8./3.0,28.0};
+	//function f = function(function::lorenz_equation, lorenzParams, 3, 3);
+	//std::vector<std::pair<std::vector<double>, double>> y = f.runge_kutta4th(make_pair(x, 0), 100, 0.001);
+	//matrix::printMatrixToFile(y, "lorenz.txt");
+	//plot3D("lorenz", "lorenz", "Sistema de Lorenz", "2:3:4");
 
-	function f(function::sistemaAmigos, params, 2, 2);
-	std::vector<double> x = { 10.0,0.000};
-	
-	std::vector<std::pair<std::vector<double>, double>> y = function::runge_kutta4th(f, make_pair(x, 0), 100, 0.01);
+	std::vector<double> x = { 1.0,0.0 };
+	std::vector<double> pendulumParams = { 1.0,2.5};
+	function pendulum = function(function::pendulum, pendulumParams, 2);
+	std::vector<std::pair<std::vector<double>, double>> y = pendulum.runge_kutta4th(make_pair(x, 0), 100, 0.001);
+	matrix::printMatrixToFile(y, "pendulum.txt");
 
-	printMatrixToFile(y, "amigos.txt");
+	plotting::plot2D("pendulum_b2.5", "pendulum", "Magnetic dipole in an osciling magnectic field with frequency of 2.5", "1:2");
+	auto stop = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+	std::cout << "\n Time taken by function: " << duration.count() << " miliseconds" << "\n";
 
 	return 0;
 }
