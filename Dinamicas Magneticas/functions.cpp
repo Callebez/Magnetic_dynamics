@@ -1,5 +1,5 @@
 #include "functions.h"
-function::function(std::vector<double>(*fun) (std::pair<std::vector<double>, double>, std::vector<double>), std::vector<double> param,unsigned int dim)
+function::function(std::vector<double>(*fun) (std::pair<std::vector<double>, double>, std::vector<double>), std::pair<std::vector<double>, double> x0, std::vector<double> param,unsigned int dim)
 {
 	n_dim = dim;
     params = param;
@@ -57,6 +57,8 @@ std::vector<std::pair<std::vector<double>, double>> function::runge_kutta4th(std
     {
         res[i+1] = std::make_pair(runge_kutta_step(res[i], h), res[i].second + h);
     }
+    solved = res;
+    x0 = x;
     return res;
 }
 std::vector<std::pair<std::vector<double>, double>> function::func_test(unsigned n_points, double t0, double tf)
@@ -83,15 +85,39 @@ std::complex<double> multiRealByComplex(std::complex<double> z, double x)
 {
     return std::complex<double>(z.real() * x, z.imag() * x);
 }
-std::vector<std::complex<double>> function::fourierTransform(std::vector<std::pair<std::vector<double>, double>> f,double w)
+std::complex<double> function::fourierTransform(std::vector<std::pair<std::vector<double>, double>> f,double frequency, double t0, double tf)
 {
     unsigned int n = f.size();
     std::vector<std::complex<double>> fexp(n);
+    std::complex<double> transform;
     for (unsigned int i = 0; i < n; i ++)
     {
-        fexp[i] = multiRealByComplex(complexExp(w, f[i].second), f[i].first[0]);
+        fexp[i] = complexExp(frequency, f[i].second)* f[i].first[0];
     }
-    return fexp;
+    transform = 2.0/(tf-t0)*simpsonOneThird(fexp, t0, tf);
+    return transform;
+}
+std::vector<std::complex<double>> function::fourierTransformRange(std::vector<std::pair<std::vector<double>, double>> f, double inicialFrequency, double finalFrequency, double step, double t0, double tf)
+{
+    unsigned int n_iterations = (unsigned int((finalFrequency - inicialFrequency) / step));
+    std::vector<std::complex<double>> fTransform (n_iterations);
+    for (unsigned int i = 0; i < n_iterations; i++)
+    {
+        fTransform[i] = function::fourierTransform(f, i * step, 0, tf);
+    }
+    return fTransform;
+}
+std::vector<std::pair<std::complex<double>, double>> function::fourierTransformRange(double inicialFrequency, double finalFrequency, double step, double t0, double tf)
+{
+    unsigned int n_iterations = (unsigned int((finalFrequency - inicialFrequency) / step));
+    std::vector<std::pair<std::complex<double>, double>> fTransform(n_iterations);
+    for (unsigned int i = 0; i < n_iterations; i++)
+    {
+        fTransform[i].first = function::fourierTransform(solved, i * step, 0, tf);
+        fTransform[i].second = i * step;
+
+    }
+    return fTransform;
 }
 std::complex<double> function::simpsonOneThird(std::vector<std::complex<double>> f,double t0,double tf)
 {

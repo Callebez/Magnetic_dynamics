@@ -35,28 +35,41 @@ int main(void)
 	///////////////////////////////////////////////////////////////
 
 	std::vector<double> x = { 1.0,0.0 };
-	std::vector<double> pendulumParams = { 1.0,0.75};
-	
-	function magenticDipole = function(function::magenticDipole, pendulumParams, 2);
-	
-	std::vector<std::pair<std::vector<double>, double>> y = magenticDipole.runge_kutta4th(make_pair(x, 0), 100.0 * PI, 0.1);
-	matrix::printMatrixToFile(y, "./Dat/dipole_002_f0.75.txt");
-	
-	plotting::plot2D("dipole_002_f0.75", "./Dat/dipole_002_f0.75", "Magnetic dipole in an osciling magnectic field with frequency of 0.75", "1:2");
+	std::vector<double> pendulumParams = { 1.0,0.0};
+	double tf = 10.0 * PI;
 
-	std::vector <std::complex<double>> yComplex;
-	std::complex<double> integral;
+	function magneticDipole = function(function::magenticDipole, make_pair(x, 0),pendulumParams, 2);
+	
+	std::vector<std::pair<std::vector<double>, double>> y = magneticDipole.runge_kutta4th(make_pair(x, 0), tf, 0.1);
+	//matrix::printMatrixToFile(y, "./Dat/dipole_001_f2.5.txt");
+	
+	//plotting::plot2D("dipole_001_f2.5", "./Dat/dipole_001_f2.5", "Magnetic dipole in an osciling magnectic field with frequency of 2.5", "1:2");
+
 	std::ofstream output;
-
-	output.open("./Dat/FourierTransform0_75.txt");
-	for (unsigned int i = 0; i < 1e3; i++)
+	output.open("./Dat/TesteFourierNovo.txt");
+	//for (unsigned int i = 0; i < 1e5; i++)
+	//{
+	//	fTransform = function::fourierTransform(y, i*0.01,0,tf);
+	//	
+	//	output << i*0.01 <<" " << std::norm(fTransform) << "\n";
+	//}
+	std::vector<std::pair<std::complex<double>, double>> fTransform = magneticDipole.fourierTransformRange(0.0, tf, 0.001, 0, 10);
+	for (auto i:fTransform)
 	{
-		yComplex = function::fourierTransform(y, i*0.1);
-		integral = function::simpsonOneThird(yComplex, 0, 100.0 * PI);
-		output << i*0.1 <<" " << std::norm(integral) << "\n";
+		output << i.second  <<' ' << i.first.real() <<" " << i.first.imag() << " " << std::norm(i.first) << "\n";
 	}
 	output.close();
-	plotting::plot2D("fourierTransformDipole0_75", "./Dat/FourierTransform0_75", "Fourier Transform Dipole in a uniform magnetic field f 0.75", "1:2");
+	std::vector<double> frequencies;
+
+	for (unsigned int i = 0; i < fTransform.size(); i++)
+	{
+		if(std::norm(fTransform[i].first) > 0.8)
+		{
+			frequencies.emplace_back(std::norm(fTransform[i].first));
+		}
+	}
+	std::cout << frequencies[round((frequencies.size()) / 2)] << "\n";
+	//plotting::plot2D("fourierTransformDipole2_50", "./Dat/FourierTransform2_50", "Fourier Transform Dipole in a uniform magnetic field f 2.50", "1:2");
 
 
 	auto stop = std::chrono::high_resolution_clock::now();
