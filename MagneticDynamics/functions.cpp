@@ -97,19 +97,19 @@ std::complex<double> function::fourierTransform(std::vector<std::pair<std::vecto
     transform = 2.0/(tf-t0)*simpsonOneThird(fexp, t0, tf);
     return transform;
 }
-std::vector<std::complex<double>> function::fourierTransformRange(std::vector<std::pair<std::vector<double>, double>> f, double inicialFrequency, double finalFrequency, double step, double t0, double tf)
-{
-    unsigned int n_iterations = (unsigned int((finalFrequency - inicialFrequency) / step));
-    std::vector<std::complex<double>> fTransform (n_iterations);
-    for (unsigned int i = 0; i < n_iterations; i++)
-    {
-        fTransform[i] = function::fourierTransform(f, i * step, 0, tf);
-    }
-    return fTransform;
-}
+// std::vector<std::complex<double>> function::fourierTransformRange(std::vector<std::pair<std::vector<double>, double>> f, double inicialFrequency, double finalFrequency, double step, double t0, double tf)
+// {
+//     unsigned int n_iterations = (unsigned int((finalFrequency - inicialFrequency) / step));
+//     std::vector<std::complex<double>> fTransform (n_iterations);
+//     for (unsigned int i = 0; i < n_iterations; i++)
+//     {
+//         fTransform[i] = function::fourierTransform(f, i * step, 0, tf);
+//     }
+//     return fTransform;
+// }
 std::vector<std::pair<std::complex<double>, double>> function::fourierTransformRange(double inicialFrequency, double finalFrequency, double step, double t0, double tf)
 {
-    unsigned int n_iterations = (unsigned int((finalFrequency - inicialFrequency) / step));
+    unsigned int n_iterations = (unsigned int)((finalFrequency - inicialFrequency) / step);
     std::vector<std::pair<std::complex<double>, double>> fTransform(n_iterations);
     for (unsigned int i = 0; i < n_iterations; i++)
     {
