@@ -1,7 +1,7 @@
 target 	:= main 
-objs 	:= ./build/main.o ./build/functions.o ./build/matrices.o ./build/plotting.o ./build/integration.o
+objs 	:= ./build/main.o ./build/functions.o ./build/matrices.o ./build/plotting.o ./build/integration.o ./build/RungeKutta.o ./build/fourier.o 
 CC 		:= g++
-CFLAGS 	:= -g -Wall -lm -pthread
+CFLAGS 	:= -g -Wall -lm -pthread -Wextra 
 
 all: $(target)
 run: $(target)

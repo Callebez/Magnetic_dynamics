@@ -12,7 +12,7 @@ void plotting::plot3D(const char* outputFile, const char* inputFile, const char*
 		fprintf(gnupipe, "set border lw 3 \n \n");
 		fprintf(gnupipe, "set key opaque \n\n");
 		fprintf(gnupipe, "set output \'%s.png\'\n", outputFile);
-		fprintf(gnupipe, "splot \'%s.txt\' u 2:3:4 w lines lw 0.5 lc 7 title \'%s\'\n", outputFile, usingLines);
+		fprintf(gnupipe, "splot \'%s.txt\' u 2:3:4 w lines lw 0.5 lc 7 title \'%s\'\n", inputFile, usingLines);
 	}
 }
 
