@@ -8,8 +8,9 @@
 class matrix
 {
 	private:
-		unsigned int rows, columns;
-		std::vector<std::vector<double>> data;
+		unsigned int rows = 0, columns = 0;
+		double** data;
+		// std::vector<std::vector<double>> data;
 
 	public:
 
@@ -37,7 +38,7 @@ class matrix
 		static double dotProduct(std::vector<double>& v, std::vector<double>& u);
 		static std::vector<double> sub_vectors(std::vector<double>& v, std::vector<double>u);
 		static std::vector<double> sum_vectors(std::vector<double>& v, std::vector<double>u);
-		static std::vector<double> axpy(std::vector<double>& x, std::vector<double>& y, double a);
+		static double* axpy(double*& x, double*& y, double a, uint size);
 		static std::vector<double> ax(std::vector<double>& x, double a);
 		static matrix identityMatrix(unsigned int order);
 		static void printMatrixToFile(std::vector<std::pair<std::vector<double>, double>>& matrix, std::string fileName);

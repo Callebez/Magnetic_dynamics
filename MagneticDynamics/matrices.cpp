@@ -1,15 +1,19 @@
 #include "matrices.h"
-matrix::matrix(unsigned int nrows, unsigned int ncolumns)
+
+matrix::matrix(uint nrows, uint ncolumns)
 {
-	rows = nrows;
-	columns = ncolumns;	 
-	std::vector<std::vector<double>> elements(rows);
-	for (auto& i : elements)
-	{
-		std::vector<double> column(columns);
-		i = column;
-	}
-	data = elements;
+    double ** m = new double*[rows];
+    if(rows)
+    {
+        m[0] = new double[nrows*ncolumns];
+        for (uint i = 1; i < nrows; ++i)
+        {
+            m[i] = m[0] + i * ncolumns;
+        }
+    }
+    data = m; 
+    rows = nrows;
+    columns = nrows;
 }
 unsigned int matrix::get_rows()
 {
@@ -45,7 +49,7 @@ void matrix::set_columns(unsigned int new_ncolumns)
 }
 void matrix::print_matrix()
 {
-	if (rows == NULL || columns == NULL)
+	if (rows == 0 || columns == 0)
 	{
 		throw std::invalid_argument("Invalid matrix!");
 	}
@@ -210,10 +214,10 @@ double matrix::distance(std::vector<double>& v, std::vector<double>& u)
 	std::vector<double> a = sub_vectors(v, u);
 	return norm(a);
 }
-std::vector<double> matrix:: axpy(std::vector<double>& x, std::vector<double>& y, double a)
+double* matrix:: axpy(double*& x, double*& y, double a, uint size)
 {
-	std::vector<double> res(x.size());
-	for (unsigned int i = 0; i < x.size(); i++)
+	double* res = new double[size];
+	for (unsigned int i = 0; i < size; i++)
 	{
 		res[i] = a * x[i] + y[i];
 	}
@@ -236,7 +240,7 @@ matrix matrix::copy_matrix()
 	{
 		for (unsigned int j = 0; j < columns; j++)
 		{
-			v.data[i, j] = data[i, j];
+			v.data[i][j] = data[i][j];
 		}
 	}
 	return v;
