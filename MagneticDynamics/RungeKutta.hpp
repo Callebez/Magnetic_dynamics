@@ -1,7 +1,7 @@
 #pragma once
 #include<vector>
-#include "matrices.h"
-#include "functions.h"
+#include "matrices.hpp"
+#include "functions.hpp"
 #include "Solutions.hpp"
 
 
