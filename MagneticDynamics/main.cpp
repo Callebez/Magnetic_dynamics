@@ -2,7 +2,7 @@
 #include <fstream>
 #include<chrono>
 #include<cstdlib>
-#include "matrices.h"
+#include "matrices.hpp"
 #include "functions.hpp"
 #include <ctime>
 #include "plotting.h"

@@ -1,4 +1,4 @@
-#include "matrices.h"
+#include "matrices.hpp"
 
 matrix::matrix(uint nrows, uint ncolumns)
 {
