@@ -30,7 +30,7 @@ void rungeKutta::runge_kutta4th(double* (*func) (std::pair<double*, double>, dou
     rk_int->params = param;
     rk_int->step = h; 
     rk_int->sysDim = dim;
-    rk_int->data = new std::pair<double*,double>[rk_int->n_iterations];
+    rk_int->data = std::vector<std::pair<double*,double>> (rk_int->n_iterations);
     rk_int->data[0] = x0; 
 
     for (unsigned int i = 0; i < rk_int->n_iterations-1; i++)

@@ -26,6 +26,7 @@ public:
     solution<double*>* rk_int = new solution<double*>;
     solution<double>* fourier_transform = new solution<double>;
     static double* test(std::pair<double*, double>x, double* param);
+    function(){;};
     static inline function test()
     {
         double* param = new double;
@@ -60,7 +61,11 @@ public:
         params = param;
         func = fun;
     };
-
+    // ~function()
+    // {
+    //     delete rk_int;
+    //     delete fourier_transform;
+    // }
     /**
      * @brief Overloads the operator () so that the pointer func can be used to evaluete the function.
      * 

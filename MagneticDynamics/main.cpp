@@ -17,7 +17,32 @@ double* function::test(std::pair<double*, double>x, double* param)
 	*y = 3.0*sin(x.second)+1.5*sin(2.0*x.second)+0.75*sin(3.0*x.second)+0.375*sin(4.0*x.second)+0.01*sin(8.0*x.second);
 	return y;
 }
-
+std::pair<double,double> largestElement(solution<double>& X)
+{
+	std::pair<double,double> max = X.data[0];
+	for(uint i = 1; i < X.get_n_iterations(); i++)
+	{
+		if(max.first < X.data[i].first)
+		{
+			max = X.data[i];
+		}
+	}
+	return max;
+}
+std::vector<std::pair<double,double>> simpleFilter(solution<double>& x)
+{
+	std::vector<std::pair<double,double>> accepted; 
+	std::pair<double,double> max = largestElement(x);
+	// std::cout<<max.first*0.5<<'\n';
+	for(uint i = 0; i < x.get_n_iterations(); i++)
+	{
+		if(x.data[i].first/max.first >= 0.50)
+		{
+			accepted.emplace_back(x.data[i]);
+		}
+	}
+	return accepted;
+}
 int main(void)
 {
 	auto start = std::chrono::high_resolution_clock::now(); 
@@ -25,26 +50,71 @@ int main(void)
 	std::srand(time(0));
  
 
-	function testFunc = function::test(); 
-	double* x = new double[1]; 
-	solution<double*>* signal = function::createSignal(testFunc, x,0, 1000,0.01,1);
+	// function testFunc = function::test(); 
+	// double* x = new double[1]; 
+	// solution<double*>* signal = function::createSignal(testFunc, x,0, 10,0.01,1);
+	// testFunc.rk_int = signal;
+	// testFunc.rk_int->t0 = signal->t0;  
+	// testFunc.rk_int->tf = signal->tf; 
+	// solution<double>* four = testFunc.applyFourierTransform(0,10,0.001);
+	// std::string fourierzin = "FourierTest.txt";
 
-	testFunc.rk_int = signal;
-	testFunc.rk_int->t0 = signal->t0;  
-
-	testFunc.rk_int->tf = signal->tf; 
-	solution<double>* four = testFunc.applyFourierTransform(0,10,0.001);
-
-	four->printSolutionDouble("FourierTest.txt");
+	// four->printSolutionDouble(fourierzin);
 
 
-	// function f = function::lorenz();
-	// double* x = new double[3]{1.0,1.0,1.0};
 
-	// solution<double*>* y = f.applyRunge_kutta4th(std::make_pair(x,0),0,50,1e-3);
-	// solution<double>* four = f.applyFourierTransform(0,20,0.05);
-	// four->printSolutionDouble("Teste.txt");
+	////////////////////////////////////////////////////////////////////////
 
+	double* x = new double[2]{1.0,0.0};
+ 	std::fstream plot; 
+	double step = 0.5;
+	plot.open("bifucacao.txt",std::fstream::out);
+	for(int j = 0; j < 100; j++)
+	{
+		double* param = new double[2]{1.0,j*step};
+		function* f = new function();
+		*f = function(function::magenticDipole,2,2,param);
+
+		solution<double*>* y = new solution<double*>;
+		y = f->applyRunge_kutta4th(std::make_pair(x,0),0,100,1e-3);
+		solution<double>* four = new solution<double>;
+		four = f->applyFourierTransform(0,5.5,0.1);
+		std::vector<std::pair<double,double>> filtered = simpleFilter(*four);
+		
+		// delete f.rk_int;
+
+		// delete f.fourier_transform;
+		delete param;
+		delete y;
+		delete four; 
+		delete f;
+		for(auto k : filtered)
+		{
+			plot<<j*step<<" "<<k.second<<"\n";
+		}
+
+		filtered.clear();
+	}
+	plot.close();
+
+	// double* param = new double[2]{1.0, 0.5};
+	// function* f = new function();
+	// *f = function(function::magenticDipole,2,2,param);
+
+	// solution<double*>* y = new solution<double*>;
+	// y = f->applyRunge_kutta4th(std::make_pair(x,0),0,50,1e-4);
+	// solution<double>* four = new solution<double>;
+	// four = f->applyFourierTransform(-2,2,0.01);
+	
+	// // for(auto i : filtered)
+	// // {
+	// // 	std::cout<<i.first<<" "<<i.second<<"\n";
+	// // }
+	
+	// std::string rk = "Teste.txt";
+	// std::string fourierzin = "FourierTest.txt";
+	// y->printSolutionDoublePtr(rk);
+	// four->printSolutionDouble(fourierzin);
     
 	// std::fstream plot; 
 	// plot.open("Dat/Grafico.txt",std::fstream::out);

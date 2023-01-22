@@ -8,13 +8,13 @@ void fourier::fourierFrequencySpectrumAbsoluteValue(solution<double*>* signal, d
     fourierTransform->sysDim = 1; 
     fourierTransform->n_iterations = (uint) ((finalFrequency-initialFrequency)/frequencyStep);
 
-    fourierTransform->data = new std::pair<double,double>[fourierTransform->n_iterations];
+    fourierTransform->data = std::vector<std::pair<double,double>>(fourierTransform->n_iterations);
 
 
     for(uint i = 0; i < fourierTransform->n_iterations; i++)
     {      
         
-        fourierTransform->data[i].first = std::pow(std::abs(fourierFreqency(signal, initialFrequency + i*frequencyStep)),1);
+        fourierTransform->data[i].first = std::pow(std::abs(fourierFreqency(signal, initialFrequency + i*frequencyStep)),2);
         fourierTransform->data[i].second = initialFrequency + i*frequencyStep;
     }
 

@@ -4,7 +4,7 @@ template <class T>
 class solution
 {
 public:
-	std::pair<T,double>* data;
+	std::vector<std::pair<T,double>> data;
 	
 	double t0 ;
     double tf ; 
@@ -12,18 +12,18 @@ public:
     double* params;
     uint n_iterations; 
     uint sysDim; 
-	~solution()
-	{
-		free(params);
+	// ~solution()
+	// {
+	// 	free(params);
 		
-		for(uint i = 0; i < n_iterations; i++)
-		{
-			free(data[i].first); 
-		}
-		delete data;
-	}
+	// 	for(uint i = 0; i < n_iterations; i++)
+	// 	{
+	// 		free(data[i].first); 
+	// 	}
+	// 	delete data;
+	// }
 
-	void printSolutionDoublePtr(char* filename)
+	void printSolutionDoublePtr(std::string& filename)
 	{
 	    std::fstream plot; 
 		plot.open(filename,std::fstream::out);
@@ -41,7 +41,7 @@ public:
 
 		plot.close();
 	};
-	void printSolutionDouble(char* filename)
+	void printSolutionDouble(std::string& filename)
 	{
 	    std::fstream plot; 
 		plot.open(filename,std::fstream::out);

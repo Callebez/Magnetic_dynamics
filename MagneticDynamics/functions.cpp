@@ -29,10 +29,7 @@ double* function::lorenz_equation(std::pair<double*, double>x, double* param)
 
 solution<double>* function::applyFourierTransform(double initialFrequency, double finalFrequency, double frequencyStep)
 {
-    // std::cout<<"memory of the rk4 "<<&rk_int<<"\n";
-    fourier F;
-    // std::cout<<"memory of the function "<<&(F.fourierTransform)<<"\n";
-    
+    fourier F;   
     F.fourierFrequencySpectrumAbsoluteValue(rk_int,initialFrequency,finalFrequency,frequencyStep);
     fourier_transform = F.get_FrequencySpectrum();
     return fourier_transform;
@@ -43,7 +40,7 @@ solution<double*>* function::createSignal(function signalFunc, double* params_, 
 	solution<double*>* signal = new solution<double*>;
 
 	uint n = (uint)(tf_- t0_)/step_;
-	signal->data = new std::pair<double*,double>[n];
+	signal->data = std::vector<std::pair<double*,double>> (n);
 	
 	double* x = new double[sysDim_];
 
