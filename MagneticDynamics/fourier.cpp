@@ -1,6 +1,6 @@
 #include "fourier.hpp"
 
-void fourier::fourierFrequencySpectrumAbsoluteValue(solution<double*>* signal, double initialFrequency, double finalFrequency, double frequencyStep)
+void fourier::fourierFrequencySpectrumAbsoluteValue(solution<double*> signal, double initialFrequency, double finalFrequency, double frequencyStep)
 {
     fourierTransform->step = frequencyStep;
     fourierTransform->t0 = initialFrequency;
@@ -20,18 +20,18 @@ void fourier::fourierFrequencySpectrumAbsoluteValue(solution<double*>* signal, d
 
     
 }
-std::complex<double> fourier::fourierFreqency(solution<double*>* signal, double frequency)
+std::complex<double> fourier::fourierFreqency(solution<double*> signal, double frequency)
 {
-    std::complex<double>* fexp = new std::complex<double> [signal->n_iterations];
+    std::complex<double>* fexp = new std::complex<double> [signal.n_iterations];
     std::complex<double> transform;
-    for (unsigned int i = 0; i < signal->n_iterations; i ++)
+    for (unsigned int i = 0; i < signal.n_iterations; i ++)
     {
-        fexp[i] = std::exp(std::complex<double>(0,-frequency*signal->data[i].second))* signal->data[i].first[0];
+        fexp[i] = std::exp(std::complex<double>(0,-frequency*signal.data[i].second))* signal.data[i].first[0];
 
     }
     // std::cout<<signal->tf<<"\n";
 
-    transform = 2.0/(signal->tf-signal->t0)*integration::simpsonOneThird(fexp, signal->t0, signal->tf ,signal->n_iterations);
+    transform = 2.0/(signal.tf-signal.t0)*integration::simpsonOneThird(fexp, signal.t0, signal.tf ,signal.n_iterations);
     // std::cout<<transform<<"\n";
 
     return transform;

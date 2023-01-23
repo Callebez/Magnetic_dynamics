@@ -1,12 +1,13 @@
 #include "functions.hpp"
 
 
-solution<double*>* function::applyRunge_kutta4th(std::pair<double*, double> x0, double t_initial, double t_final, double h)
+solution<double*> function::applyRunge_kutta4th(std::pair<double*, double> x0, double t_initial, double t_final, double h)
 {
     rungeKutta Rk4;
 
     Rk4.runge_kutta4th(func,x0,params,t_initial,t_final,h, x_dim);
     rk_int = Rk4.getSolution();
+    Rk4.rk_int->data.clear();
     return rk_int;
 }
 double* function::magenticDipole(std::pair<double*, double> x, double* param)

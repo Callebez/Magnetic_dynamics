@@ -24,8 +24,8 @@
 class rungeKutta
 {
 private:
-    solution<double*>* rk_int = new solution<double*>;  
 public:
+    solution<double*> rk_int;  
 
     /**
      * @brief Function to perform the a step of runge kutta integration, 
@@ -53,7 +53,7 @@ public:
      * @param dim Dimension of the system of ODEs;
      */
     void runge_kutta4th(double* (*func) (std::pair<double*, double>, double*), std::pair<double*, double> x0, double* param, double t_initial, double t_final, double h, uint dim);
-    solution<double*>* getSolution(){return rk_int;};
+    solution<double*> getSolution(){return *rk_int;};
     
 
 };

@@ -68,34 +68,42 @@ int main(void)
 	double* x = new double[2]{1.0,0.0};
  	std::fstream plot; 
 	double step = 0.5;
+	double* param = new double[2];
+	function* f = new function();
+	std::vector<std::pair<double,double>> filtered;
 	plot.open("bifucacao.txt",std::fstream::out);
-	for(int j = 0; j < 100; j++)
+
+	std::pair<double*,double> X = std::make_pair(x,0);
+	for(int j = 0; j < 10; j++)
 	{
-		double* param = new double[2]{1.0,j*step};
-		function* f = new function();
+		param[0] = 1.0;
+		param[1] = j*step;
 		*f = function(function::magenticDipole,2,2,param);
-
-		solution<double*>* y = new solution<double*>;
-		y = f->applyRunge_kutta4th(std::make_pair(x,0),0,100,1e-3);
+		f->applyRunge_kutta4th(X,0,100,1e-3);
 		solution<double>* four = new solution<double>;
-		four = f->applyFourierTransform(0,5.5,0.1);
-		std::vector<std::pair<double,double>> filtered = simpleFilter(*four);
+		four = f->applyFourierTransform(0,10,0.1);
+		filtered = simpleFilter(*four);
 		
+		f->rk_int->data.clear();
+		delete f->rk_int;
 		// delete f.rk_int;
+		f->fourier_transform->data.clear();
+		delete f->fourier_transform;
 
-		// delete f.fourier_transform;
-		delete param;
-		delete y;
-		delete four; 
-		delete f;
+		// delete param;
+		// delete y;
+		// delete four; 
+		// delete f;
+		plot.open("bifucacao.txt",std::fstream::app);
+
 		for(auto k : filtered)
 		{
-			plot<<j*step<<" "<<k.second<<"\n";
+			plot<<j*step<<" "<<k.first<<" "<<k.second<<"\n";
 		}
+		plot.close();
 
 		filtered.clear();
 	}
-	plot.close();
 
 	// double* param = new double[2]{1.0, 0.5};
 	// function* f = new function();

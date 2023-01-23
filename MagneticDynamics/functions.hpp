@@ -23,8 +23,8 @@ private:
 	double* (*func) (std::pair<double*, double>, double*) = NULL;// F(x,t,param) 
 public:
 
-    solution<double*>* rk_int = new solution<double*>;
-    solution<double>* fourier_transform = new solution<double>;
+    solution<double*> rk_int;
+    solution<double>* fourier_transform;
     static double* test(std::pair<double*, double>x, double* param);
     function(){;};
     static inline function test()
@@ -108,7 +108,7 @@ public:
      * @param h Step used in the integration; 
      * @return solution* List of coordinates (X, t) for the integration.
      */
-    solution<double*>* applyRunge_kutta4th(std::pair<double*, double> x0, double t_initial, double t_final, double h);
+    solution<double*> applyRunge_kutta4th(std::pair<double*, double> x0, double t_initial, double t_final, double h);
     /**
      * @brief Function to apply the Fourier Transform of a function. It only works in function objects! 
      * 
