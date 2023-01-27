@@ -24,9 +24,11 @@
 class rungeKutta
 {
 private:
+    std::unique_ptr<solution<double*>> rk_int;
+    // solution<double*>* rk_int  ;  
+    
 public:
-    solution<double*> rk_int;  
-
+    rungeKutta(){;};
     /**
      * @brief Function to perform the a step of runge kutta integration, 
      * \f$ y_{n+1} = y_n + \frac{1}{6}(k_1+k_2+k_3+k_4)*h \f$
@@ -53,7 +55,15 @@ public:
      * @param dim Dimension of the system of ODEs;
      */
     void runge_kutta4th(double* (*func) (std::pair<double*, double>, double*), std::pair<double*, double> x0, double* param, double t_initial, double t_final, double h, uint dim);
-    solution<double*> getSolution(){return *rk_int;};
+    std::unique_ptr<solution<double*>> getSolution(){return std::move(rk_int);};
+    // ~rungeKutta()
+    // {
+    //     rk_int->data.clear();
+    //     // delete rk_int->data; 
+    //     // delete rk_int;
+    //     // delete this;
+    //     // std::cout<<this<<"\n";
+    // }
     
 
 };

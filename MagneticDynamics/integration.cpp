@@ -1,5 +1,5 @@
 #include "integration.hpp"
-std::complex<double> integration::simpsonOneThird(std::complex<double>* f,double t0,double tf, uint size)
+std::complex<double> integration::simpsonOneThird(std::vector<std::complex<double>> f,double t0,double tf, uint size)
 {
     unsigned int n;
     if (size % 2 != 0) { n = size - 1; }

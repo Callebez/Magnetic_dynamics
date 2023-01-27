@@ -8,7 +8,6 @@
 #include "plotting.h"
 #include <algorithm>
 
-
 #define PI 3.14159265359
 
 double* function::test(std::pair<double*, double>x, double* param)
@@ -29,19 +28,21 @@ std::pair<double,double> largestElement(solution<double>& X)
 	}
 	return max;
 }
-std::vector<std::pair<double,double>> simpleFilter(solution<double>& x)
+void simpleFilter(solution<double>& x, std::vector<std::pair<double,double>>& accepted)
 {
-	std::vector<std::pair<double,double>> accepted; 
-	std::pair<double,double> max = largestElement(x);
+	// std::vector<std::pair<double,double>>* accepted= new std::vector<std::pair<double,double>>; 
+	// std::pair<double,double>* max = new std::pair<double,double>;
+	// max = largestElement(x);
 	// std::cout<<max.first*0.5<<'\n';
 	for(uint i = 0; i < x.get_n_iterations(); i++)
 	{
-		if(x.data[i].first/max.first >= 0.50)
+		if(x.data[i].first/largestElement(x).first >= 0.50)
 		{
 			accepted.emplace_back(x.data[i]);
 		}
 	}
-	return accepted;
+	// delete max;
+	// return accepted;
 }
 int main(void)
 {
@@ -67,33 +68,26 @@ int main(void)
 
 	double* x = new double[2]{1.0,0.0};
  	std::fstream plot; 
-	double step = 0.5;
+	double step = 0.025;
 	double* param = new double[2];
-	function* f = new function();
 	std::vector<std::pair<double,double>> filtered;
 	plot.open("bifucacao.txt",std::fstream::out);
+	
+	std::unique_ptr<function> f = std::make_unique<function>(function::magenticDipole,2,2,param);
 
-	std::pair<double*,double> X = std::make_pair(x,0);
-	for(int j = 0; j < 10; j++)
+	std::pair<double*,double> X = std::make_pair(x,0); 
+	for(int j = -100; j < 100; j++)
 	{
 		param[0] = 1.0;
 		param[1] = j*step;
-		*f = function(function::magenticDipole,2,2,param);
-		f->applyRunge_kutta4th(X,0,100,1e-3);
-		solution<double>* four = new solution<double>;
-		four = f->applyFourierTransform(0,10,0.1);
-		filtered = simpleFilter(*four);
-		
+		f->set_param(param);    
+		f->applyRunge_kutta4th(X,0,100,1e-2);
+		// solution<double>* four = new solution<double>;
+		f->applyFourierTransform(-2,2,0.01);
+		simpleFilter(*f->fourier_transform,filtered);
 		f->rk_int->data.clear();
-		delete f->rk_int;
-		// delete f.rk_int;
 		f->fourier_transform->data.clear();
-		delete f->fourier_transform;
 
-		// delete param;
-		// delete y;
-		// delete four; 
-		// delete f;
 		plot.open("bifucacao.txt",std::fstream::app);
 
 		for(auto k : filtered)
@@ -104,6 +98,10 @@ int main(void)
 
 		filtered.clear();
 	}
+	// std::cout<<"salve!\n";
+	free(x);
+	// free(param);
+	// free(f);
 
 	// double* param = new double[2]{1.0, 0.5};
 	// function* f = new function();

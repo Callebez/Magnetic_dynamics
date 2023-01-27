@@ -1,5 +1,7 @@
 #pragma once
 #include"matrices.hpp"
+#include <memory>
+
 template <class T>
 class solution
 {
@@ -13,6 +15,11 @@ public:
     uint n_iterations; 
     uint sysDim; 
 	// ~solution()
+	// {
+		
+	// 	// free(params);
+	// 	// data.clear();
+	// };
 	// {
 	// 	free(params);
 		
