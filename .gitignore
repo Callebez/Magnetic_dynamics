@@ -9,7 +9,7 @@ Dat
 Docs 
 
 *.txt
-
+*.png
 *.o
 *.dat
 # User-specific files

@@ -23,8 +23,8 @@ private:
 	double* (*func) (std::pair<double*, double>, double*) = NULL;// F(x,t,param) 
 public:
 
-    solution<double*>* rk_int = new solution<double*>;
-    solution<double>* fourier_transform = new solution<double>;
+    std::unique_ptr<solution<double*>> rk_int;
+    std::unique_ptr<solution<double>> fourier_transform;
     static double* test(std::pair<double*, double>x, double* param);
     function(){;};
     static inline function test()
@@ -63,6 +63,7 @@ public:
     };
     // ~function()
     // {
+    //     std::cout<<"The destructor was called!\n";
     //     delete rk_int;
     //     delete fourier_transform;
     // }
@@ -108,7 +109,7 @@ public:
      * @param h Step used in the integration; 
      * @return solution* List of coordinates (X, t) for the integration.
      */
-    solution<double*>* applyRunge_kutta4th(std::pair<double*, double> x0, double t_initial, double t_final, double h);
+    void applyRunge_kutta4th(std::pair<double*, double> x0, double t_initial, double t_final, double h);
     /**
      * @brief Function to apply the Fourier Transform of a function. It only works in function objects! 
      * 
@@ -117,7 +118,7 @@ public:
      * @param frquencyStep Step of the frequency. Step of the integration; 
      * @return solution<double>* Fourier transform of a function from the initial frequency to the final frequency.
      */
-    solution<double>* applyFourierTransform(double initialFrequency, double finalFrequency, double frquencyStep);
+    void applyFourierTransform(double initialFrequency, double finalFrequency, double frquencyStep);
     /**
      * @brief Implementation of the lorenz system (https://en.wikipedia.org/wiki/Lorenz_system)
      * 

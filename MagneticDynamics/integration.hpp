@@ -22,6 +22,6 @@ public:
  * @param size Size of the array of complex numbers. 
  * @return std::complex<double> Value of the integral
  */
-    static std::complex<double> simpsonOneThird(std::complex<double>* f,double t0,double tf, uint size);
+    static std::complex<double> simpsonOneThird(std::vector<std::complex<double>> f,double t0,double tf, uint size);
     inline std::complex<double> get_integral(){return integral;};
 };

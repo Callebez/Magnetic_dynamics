@@ -1,14 +1,18 @@
 #include "functions.hpp"
 
 
-solution<double*>* function::applyRunge_kutta4th(std::pair<double*, double> x0, double t_initial, double t_final, double h)
+void function::applyRunge_kutta4th(std::pair<double*, double> x0, double t_initial, double t_final, double h)
 {
-    rungeKutta Rk4;
-
-    Rk4.runge_kutta4th(func,x0,params,t_initial,t_final,h, x_dim);
-    rk_int = Rk4.getSolution();
-    return rk_int;
-}
+    std::unique_ptr<rungeKutta> Rk4 = std::make_unique<rungeKutta>();
+    // rungeKutta* Rk4 = new rungeKutta;
+    // rk_int = std::make_unique<solution<double*>>;
+    // rk_int  = new solution<double*>;
+    Rk4->runge_kutta4th(func,x0,params,t_initial,t_final,h, x_dim);
+    rk_int = Rk4->getSolution();
+    // Rk4->rk_int->data.clear();
+    // delete Rk4; 
+    // return *rk_int;
+} 
 double* function::magenticDipole(std::pair<double*, double> x, double* param)
 {   
     double* x_dot = new double[2];
@@ -27,12 +31,14 @@ double* function::lorenz_equation(std::pair<double*, double>x, double* param)
     return x_dot;
 };
 
-solution<double>* function::applyFourierTransform(double initialFrequency, double finalFrequency, double frequencyStep)
+void function::applyFourierTransform(double initialFrequency, double finalFrequency, double frequencyStep)
 {
-    fourier F;   
-    F.fourierFrequencySpectrumAbsoluteValue(rk_int,initialFrequency,finalFrequency,frequencyStep);
-    fourier_transform = F.get_FrequencySpectrum();
-    return fourier_transform;
+    std::unique_ptr<fourier> F = std::make_unique<fourier>();   
+    // auto fourier_transform = std::make_unique<solution<double>>;
+    F->fourierFrequencySpectrumAbsoluteValue(rk_int,initialFrequency,finalFrequency,frequencyStep);
+    fourier_transform = F->get_FrequencySpectrum();
+    // delete F;
+    // return fourier_transform;
 }
 
 solution<double*>* function::createSignal(function signalFunc, double* params_, double t0_, double tf_, double step_, uint sysDim_)
