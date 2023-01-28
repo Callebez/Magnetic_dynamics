@@ -2,6 +2,7 @@
 #include"matrices.hpp"
 #include <memory>
 
+
 template <class T>
 class solution
 {
@@ -14,28 +15,13 @@ public:
     double* params;
     uint n_iterations; 
     uint sysDim; 
-	// ~solution()
-	// {
-		
-	// 	// free(params);
-	// 	// data.clear();
-	// };
-	// {
-	// 	free(params);
-		
-	// 	for(uint i = 0; i < n_iterations; i++)
-	// 	{
-	// 		free(data[i].first); 
-	// 	}
-	// 	delete data;
-	// }
 
 	void printSolutionDoublePtr(std::string& filename)
 	{
 	    std::fstream plot; 
 		plot.open(filename,std::fstream::out);
 	
-		for(uint i = 0; i < n_iterations; i++)
+		for(uint i = 0; i < data.size()-1; i++)
 		{
 			plot<<data[i].second;
 

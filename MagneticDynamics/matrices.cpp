@@ -209,12 +209,12 @@ double matrix::dotProduct(std::vector<double>& v, std::vector<double>& u)
 	return prod;
 }
 double matrix::norm(std::vector<double>& v){ return sqrt(dotProduct(v, v)); }
-double matrix::distance(std::vector<double>& v, std::vector<double>& u)
+double matrix::distance(std::vector<double>& v, std::vector<double>& u) 
 {
 	std::vector<double> a = sub_vectors(v, u);
 	return norm(a);
 }
-double* matrix:: axpy(double*& x, double*& y, double a, uint size)
+double* matrix::axpy(double*& x, double*& y, double a, uint size )
 {
 	double* res = new double[size];
 	for (unsigned int i = 0; i < size; i++)

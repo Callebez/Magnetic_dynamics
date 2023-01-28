@@ -5,6 +5,7 @@
 #include <iostream>
 #include <complex>
 #include <cmath>
+#include <memory>
 class matrix
 {
 	private:

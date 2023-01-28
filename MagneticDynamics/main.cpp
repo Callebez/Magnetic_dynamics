@@ -10,12 +10,12 @@
 
 #define PI 3.14159265359
 
-double* function::test(std::pair<double*, double>x, double* param)
-{
-	double* y = new double;
-	*y = 3.0*sin(x.second)+1.5*sin(2.0*x.second)+0.75*sin(3.0*x.second)+0.375*sin(4.0*x.second)+0.01*sin(8.0*x.second);
-	return y;
-}
+// double* function::test(std::pair<double*, double>x, double* param)
+// {
+// 	double* y = new double;
+// 	*y = 3.0*sin(x.second)+1.5*sin(2.0*x.second)+0.75*sin(3.0*x.second)+0.375*sin(4.0*x.second)+0.01*sin(8.0*x.second);
+// 	return y;
+// }
 std::pair<double,double> largestElement(solution<double>& X)
 {
 	std::pair<double,double> max = X.data[0];
@@ -27,6 +27,10 @@ std::pair<double,double> largestElement(solution<double>& X)
 		}
 	}
 	return max;
+}
+void ClientCode(std::unique_ptr<Solver>& method, double* (*func) (std::pair<double*, double>, double*), std::pair<double*, double> x0, double* param, double t_initial, double t_final, double h, uint dim)
+{
+    method->Method(func,x0,param,t_initial, t_final, h, dim);
 }
 void simpleFilter(solution<double>& x, std::vector<std::pair<double,double>>& accepted)
 {
@@ -49,7 +53,40 @@ int main(void)
 	auto start = std::chrono::high_resolution_clock::now(); 
 
 	std::srand(time(0));
- 
+	double* param = new double[3];
+	param[0] = 10.0;
+	param[1] = 8.0/3.0;
+	param[2] = 28.0;
+	Lorenz fun = Lorenz(param);
+	double* coord = new double[3];
+	coord[0] = 1.0;
+	coord[1] = 1.0;
+	coord[2] = 1.0;
+	std::pair<double*,double > x = std::make_pair(coord,0);
+	// std::cout<<"function in (1,1,1): "<< fun(x)[0]<<" "<<fun(x)[1]<<" "<<fun(x)[2]<<'\n';
+	// fun.print();
+
+	std::unique_ptr<Solver> solver = std::make_unique<RK4thSolver>();
+	ClientCode(solver,Lorenz::lorenz_equation, x, param,0.0,50000.0,6e-3,3);
+	std::string testeFactory = "testeFactoryrk45.txt";
+	solver->rk_int->printSolutionDoublePtr(testeFactory);
+
+	free(param);
+	free(coord);
+
+	// free(solver);;
+	// double* (*func) (std::pair<double*, double>, double*), std::pair<double*, double> x0, double* param, double t_initial, double t_final, double h, uint dim
+	// ClienteCode(*solver, Lorenz::lorenz_equation, x, fun.get_param(),0.0,10.0, 0.1, 3);
+
+	// ptr = std::unique_ptr<double*>(new double);
+	 
+	
+	// x.set_dim(2); 
+	// for(auto i: *x)
+	// {
+	// 	std::cout<<i <<"\n";
+	// }
+	// x.time = 5;
 
 	// function testFunc = function::test(); 
 	// double* x = new double[1]; 
@@ -66,40 +103,43 @@ int main(void)
 
 	////////////////////////////////////////////////////////////////////////
 
-	double* x = new double[2]{1.0,0.0};
- 	std::fstream plot; 
-	double step = 0.025;
-	double* param = new double[2];
-	std::vector<std::pair<double,double>> filtered;
-	plot.open("bifucacao.txt",std::fstream::out);
+	// double* x = new double[2]{1.0,0.0};
+ 	// std::fstream plot; 
+	// double step = 0.025;
+	// double* param = new double[2];
+	// std::vector<std::pair<double,double>> filtered;
+	// plot.open("bifucacao.txt",std::fstream::out);
 	
-	std::unique_ptr<function> f = std::make_unique<function>(function::magenticDipole,2,2,param);
+	// std::unique_ptr<function> f = std::make_unique<function>(function::magenticDipole,2,2,param);
 
-	std::pair<double*,double> X = std::make_pair(x,0); 
-	for(int j = -100; j < 100; j++)
-	{
-		param[0] = 1.0;
-		param[1] = j*step;
-		f->set_param(param);    
-		f->applyRunge_kutta4th(X,0,100,1e-2);
-		// solution<double>* four = new solution<double>;
-		f->applyFourierTransform(-2,2,0.01);
-		simpleFilter(*f->fourier_transform,filtered);
-		f->rk_int->data.clear();
-		f->fourier_transform->data.clear();
+	// std::pair<double*,double> X = std::make_pair(x,0); 
+	// for(int j = -100; j < 100; j++)
+	// {
+	// 	param[0] = 1.0;
+	// 	param[1] = j*step;
+	// 	f->set_param(param);    
+	// 	f->applyRunge_kutta4th(X,0,100,1e-2);
+	// 	// solution<double>* four = new solution<double>;
+	// 	f->applyFourierTransform(-2,2,0.01);
+	// 	simpleFilter(*f->fourier_transform,filtered);
+	// 	f->rk_int->data.clear();
+	// 	f->fourier_transform->data.clear();
 
-		plot.open("bifucacao.txt",std::fstream::app);
+	// 	plot.open("bifucacao.txt",std::fstream::app);
 
-		for(auto k : filtered)
-		{
-			plot<<j*step<<" "<<k.first<<" "<<k.second<<"\n";
-		}
-		plot.close();
+	// 	for(auto k : filtered)
+	// 	{
+	// 		plot<<j*step<<" "<<k.first<<" "<<k.second<<"\n";
+	// 	}
+	// 	plot.close();
 
-		filtered.clear();
-	}
-	// std::cout<<"salve!\n";
-	free(x);
+	// 	filtered.clear();
+	// }
+	// // std::cout<<"salve!\n";
+	// free(x);
+	//////////////////////////////////////////////////////////////////
+
+
 	// free(param);
 	// free(f);
 
