@@ -214,14 +214,21 @@ double matrix::distance(std::vector<double>& v, std::vector<double>& u)
 	std::vector<double> a = sub_vectors(v, u);
 	return norm(a);
 }
-double* matrix::axpy(double*& x, double*& y, double a, uint size )
-{
-	double* res = new double[size];
+// double* matrix::axpy(double*& x, double*& y, double a, uint size )
+// {
+// 	double* res = new double[size];
+// 	for (unsigned int i = 0; i < size; i++)
+// 	{
+// 		res[i] = a * x[i] + y[i];
+// 	}
+// 	return res;
+// }
+void matrix::axpy(double*& x, double*& y, double a, uint size,double*& res )
+{	
 	for (unsigned int i = 0; i < size; i++)
 	{
 		res[i] = a * x[i] + y[i];
 	}
-	return res;
 }
 std::vector<double> matrix::ax(std::vector<double>& x, double a)
 {

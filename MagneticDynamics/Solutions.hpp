@@ -45,7 +45,6 @@ public:
 			plot<<" "<<data[i].first;
 			plot<<"\n";
 		}
-
 		plot.close();
 	};
 	inline double get_t0(){return t0;};

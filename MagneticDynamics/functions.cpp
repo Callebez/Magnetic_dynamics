@@ -21,14 +21,15 @@
 //     x_dot[1] = -param[0] * sin(x.first[0]-sin(param[1]*x.second));
 //     return x_dot;
 // }
-double* Lorenz::lorenz_equation(std::pair<double*, double>x, double* param)
+void Lorenz::lorenz_equation(std::pair<double*, double>x, double* param, double*& res)
 {
-    double* x_dot = new double[3];
-    x_dot[0] = param[0] * (x.first[1] - x.first[0]);
-    x_dot[1] = x.first[0] * (param[2] - x.first[2]) - x.first[1];
-    x_dot[2] = x.first[0] * x.first[1] - param[1] * x.first[2];
-    
-    return x_dot;
+    // std::cout<<"x : "<< x.first[0]<<" "<<x.first[1]<<" "<< x.first[2]<<"\n";
+    res[0] = param[0] * (x.first[1] - x.first[0]);
+    res[1] = x.first[0] * (param[2] - x.first[2]) - x.first[1];
+    res[2] = x.first[0] * x.first[1] - param[1] * x.first[2];    
+    // std::cout<<param[0] * (x.first[1] - x.first[0])<<"\n";//<< '  res: '<< res[0]<<"\n, ";
+    // std::cout<<x.first[0] * (param[2] - x.first[2]) - x.first[1]<<"\n res: " << res[1]<<"\n , ";
+    // std::cout<<x.first[0] * x.first[1] - param[1] * x.first[2]<<"res :" <<res[2]<<"\n";
 };
 // void Functions::applySolver(Solver& solverMethod, std::pair<double*,double> x0,double t0, double tf, double step)
 // {

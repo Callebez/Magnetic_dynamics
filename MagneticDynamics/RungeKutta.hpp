@@ -28,9 +28,9 @@ class Solver
 public:
     std::unique_ptr<solution<double*>> rk_int;
     virtual ~Solver(){};
-    virtual void RungeKuttaMethod(double* (*func) (std::pair<double*, double>, double*), std::pair<double*, double> x0, double* param, double t_initial, double t_final, double h, uint dim) = 0;
+    virtual void RungeKuttaMethod(void (*func) (std::pair<double*, double>, double*, double*&), std::pair<double*, double> x0, double* param, double t_initial, double t_final, double h, uint dim) = 0;
 
-    void Method(double* (*func) (std::pair<double*, double>, double*), std::pair<double*, double> x0, double* param, double t_initial, double t_final, double h, uint dim)   
+    void Method(void (*func) (std::pair<double*, double>, double*, double*&), std::pair<double*, double> x0, double* param, double t_initial, double t_final, double h, uint dim)   
     {
         RungeKuttaMethod(func, x0,  param, t_initial, t_final, h, dim);
     }
@@ -38,16 +38,75 @@ public:
 class RK4thSolver: public Solver
 {   
 public:
-    double* runge_kutta_step(double* (*func) (std::pair<double*, double>, double*),std::pair<double*, double> x);
-    void RungeKuttaMethod(double* (*func) (std::pair<double*, double>, double*), std::pair<double*, double> x0, double* param, double t_initial, double t_final, double h, uint dim);
+    double* y1;
+    double* k1;
+    double* k2;
+    double* k2aux;
+    double* k3;
+    double* k3aux;
+    double* k4;
+    double* k4aux;
+    double* runge_kutta_step(void (*func) (std::pair<double*, double>, double*, double*&),std::pair<double*, double> x);
+    void RungeKuttaMethod(void (*func) (std::pair<double*, double>, double*, double*&), std::pair<double*, double> x0, double* param, double t_initial, double t_final, double h, uint dim);
 };
 
 class RK45thSolver: public Solver
 {
+private:
+    double a2 = 0.25;
+    double a3 = 0.375;
+    double a4 = 12.0/13.0;
+    double a5 = 1;
+    double a6 = 0.5;
+    double b21 = 0.25;
+    double b31 = 3.0/32.0;
+    double b32 = 9.0/32.0;
+    double b41 = 1932.0/2197.0;
+    double b42 = -7200.0/2197.0;
+    double b43 = 7296.0/2197.0;
+    double b51 = 439.0/216.0;
+    double b52 = -8.0;
+    double b53 = 3680.0/513.0;
+    double b54 = -845.0/4104.0;
+    double b61 = -8.0/27.0;
+    double b62 = 2.0;
+    double b63 = -3544.0/2565.0;
+    double b64 = 1859.0/4104.0;
+    double b65 = -11.0/40.0;
+    // double c1 = 25.0/216.0;
+    // double c3 = 1408.0/2565.0;
+    // double c4 = 2197.0/4104.0;
+    // double c5 = -0.20;
+    double d1 = 1.0/360.0;
+    double d3 = -128.0/4275.0;
+    double d4 = -2197.0/75240.0;
+    double d5 = 0.02;
+    double d6 = 2.0/55.0;
+
+    double ch1 = 16.0/135.0; 
+    double ch2 = 0.0;
+    double ch3 = 6656.0/12825.0	; 
+    double ch4 = 28561.0/56430.0; 
+    double ch5 = -9.0/50.0	; 
+    double ch6 = 2.0/55.0;
+     
 public:
+    
+
+    double* y1;
+    double* k1;
+    double* k2;
+    double* k3;
+    double* k4;
+    double* k5;
+    double* k6;
+    double* k3aux;
+    double* k4aux1;
+    double* k4aux2;
+    double* k6aux;
     std::vector<double> erro; 
-    double* runge_kutta_step(double* (*func) (std::pair<double*, double>, double*),std::pair<double*, double> x);
-    void RungeKuttaMethod(double* (*func) (std::pair<double*, double>, double*), std::pair<double*, double> x0, double* param, double t_initial, double t_final, double h, uint dim);
+    double* runge_kutta_step(void (*func) (std::pair<double*, double>, double*, double*&),std::pair<double*, double> x);
+    void RungeKuttaMethod(void (*func) (std::pair<double*, double>, double*, double*&), std::pair<double*, double> x0, double* param, double t_initial, double t_final, double h, uint dim);
 
 };
 

@@ -28,7 +28,7 @@ std::pair<double,double> largestElement(solution<double>& X)
 	}
 	return max;
 }
-void ClientCode(std::unique_ptr<Solver>& method, double* (*func) (std::pair<double*, double>, double*), std::pair<double*, double> x0, double* param, double t_initial, double t_final, double h, uint dim)
+void ClientCode(std::unique_ptr<Solver>& method, void (*func) (std::pair<double*, double>, double*,double*&), std::pair<double*, double> x0, double* param, double t_initial, double t_final, double h, uint dim)
 {
     method->Method(func,x0,param,t_initial, t_final, h, dim);
 }
@@ -48,11 +48,26 @@ void simpleFilter(solution<double>& x, std::vector<std::pair<double,double>>& ac
 	// delete max;
 	// return accepted;
 }
+
 int main(void)
 {
 	auto start = std::chrono::high_resolution_clock::now(); 
 
 	std::srand(time(0));
+	// double* y = new double[5];
+	
+	// auto x = std::make_unique<std::vector<double>>();
+
+	// std::vector<double> y  = *x->data();
+
+	// std::cout<<*x->data(1)<<"\n";
+	// x->data[2] = 5.0;
+	// std::cout<<x->data[2];
+	// std::unique_ptr<double*> x;
+
+	// x.get() = y;
+	// x.get(0);
+
 	double* param = new double[3];
 	param[0] = 10.0;
 	param[1] = 8.0/3.0;
@@ -62,12 +77,12 @@ int main(void)
 	coord[0] = 1.0;
 	coord[1] = 1.0;
 	coord[2] = 1.0;
-	std::pair<double*,double > x = std::make_pair(coord,0);
-	// std::cout<<"function in (1,1,1): "<< fun(x)[0]<<" "<<fun(x)[1]<<" "<<fun(x)[2]<<'\n';
-	// fun.print();
 
-	std::unique_ptr<Solver> solver = std::make_unique<RK4thSolver>();
-	ClientCode(solver,Lorenz::lorenz_equation, x, param,0.0,50000.0,6e-3,3);
+	std::pair<double*,double > x = std::make_pair(coord,0);
+	
+	std::unique_ptr<Solver> solver = std::make_unique<RK45thSolver>();
+	ClientCode(solver,Lorenz::lorenz_equation, x, param,0.0,500.0,1e-3,3);
+
 	std::string testeFactory = "testeFactoryrk45.txt";
 	solver->rk_int->printSolutionDoublePtr(testeFactory);
 

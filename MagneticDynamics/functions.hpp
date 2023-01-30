@@ -9,7 +9,7 @@ class Function
 private:
     uint x_dim = 0;
     uint f_dim = 0;
-    double* (*func) (std::pair<double*, double>, double*) = NULL;
+    void (*func) (std::pair<double*, double>, double*,double*&) = NULL;
 protected:
     // std::unique_ptr<Solver> solver; 
 public:
@@ -21,11 +21,11 @@ public:
     // double* (*func) (std::pair<double*, double>, double*) get_func(){return func;};
 	void set_x_dim(uint new_x_dim){x_dim =  new_x_dim;};
 	void set_f_dim(uint new_f_dim){f_dim =  new_f_dim;};
-    void set_func(double* (*fun) (std::pair<double*, double>, double*)){func = fun;};
+    void set_func(void (*fun) (std::pair<double*, double>, double*, double*&)){func = fun;};
     void set_param(double* param){params = param;};
     // void set_param(double value, uint pos){params[pos] = value;};
     Function(){;};
-    Function(double* (*func_) (std::pair<double*, double>, double*),uint x_dim_,uint f_dim_, double* param_)
+    Function(void (*func_) (std::pair<double*, double>, double*,double*&),uint x_dim_,uint f_dim_, double* param_)
     {
         x_dim = x_dim_;
         f_dim = f_dim_;
@@ -33,9 +33,9 @@ public:
         func = func_;
     };
 
-    double* operator()(std::pair<double*, double> x)
+    void operator()(std::pair<double*, double> x, double*& res)
     {
-        return func(x,params);
+        func(x,params, res);
     };
     void print()
     {
@@ -68,7 +68,7 @@ public:
     };
     
     /**Differential equation for the Lorenz system **/    
-    static double* lorenz_equation(std::pair<double*, double>x, double* param);
+    static void lorenz_equation(std::pair<double*, double>x, double* param, double*& res);
 
 };
 // /**
