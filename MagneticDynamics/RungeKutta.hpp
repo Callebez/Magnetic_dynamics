@@ -1,7 +1,7 @@
 #pragma once
 #include<vector>
 #include "matrices.hpp"
-#include "functions.hpp"
+// #include "functions.hpp"
 #include "Solutions.hpp"
 /**I'm using the factory method to create a Runge Kutta object using 
  * different implementations of Runge Kutta Methods.**/
@@ -27,18 +27,29 @@ class Solver
 {
 public:
     std::unique_ptr<solution<double*>> rk_int;
-    virtual ~Solver(){};
+    // virtual ~Solver(){};
     virtual void RungeKuttaMethod(void (*func) (std::pair<double*, double>, double*, double*&), std::pair<double*, double> x0, double* param, double t_initial, double t_final, double h, uint dim) = 0;
 
     void Method(void (*func) (std::pair<double*, double>, double*, double*&), std::pair<double*, double> x0, double* param, double t_initial, double t_final, double h, uint dim)   
     {
         RungeKuttaMethod(func, x0,  param, t_initial, t_final, h, dim);
     }
+    ~Solver()
+    {    
+        for(uint i = 0; i < rk_int->n_iterations; i++)
+        {
+            delete[] rk_int->data[i].first;
+        }
+        rk_int->data.clear();
+        // rk_int.reset(nullptr);    
+    };
 };
+
 class RK4thSolver: public Solver
 {   
 public:
-    double* y1;
+    // double* y1;
+    // std::unique_ptr<double*> y1 ;/
     double* k1;
     double* k2;
     double* k2aux;
@@ -46,7 +57,7 @@ public:
     double* k3aux;
     double* k4;
     double* k4aux;
-    double* runge_kutta_step(void (*func) (std::pair<double*, double>, double*, double*&),std::pair<double*, double> x);
+    void runge_kutta_step(void (*func) (std::pair<double*, double>, double*, double*&),std::pair<double*, double> x,std::pair<double*, double>& y1);
     void RungeKuttaMethod(void (*func) (std::pair<double*, double>, double*, double*&), std::pair<double*, double> x0, double* param, double t_initial, double t_final, double h, uint dim);
 };
 
@@ -92,7 +103,6 @@ private:
      
 public:
     
-
     double* y1;
     double* k1;
     double* k2;

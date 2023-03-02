@@ -1,36 +1,33 @@
 #include "RungeKutta.hpp"
-double* RK4thSolver::runge_kutta_step(void (*func) (std::pair<double*, double>, double*, double*&),std::pair<double*, double> x)
+void RK4thSolver::runge_kutta_step(void (*func) (std::pair<double*, double>, double*, double*&),std::pair<double*, double> x,std::pair<double*, double>& y1 )
 {
-    y1 = new double[rk_int->sysDim];
+    // auto y1 = std::make_unique<std::vector<double>>(new double[rk_int->sysDim]);
+    // y1->resize(rk_int->sysDim);
+	// std::unique_ptr<double*> y1 = std::make_unique<double*> ();
+
+	// *y1 = new double[rk_int->sysDim];
+    // double* y1 = new double[rk_int->sysDim];
+//    for (unsigned int j = 0; j < rk_int->sysDim; j++)
+//             std::cout<<"x"<<j<<": " <<x.first[j]<<"\n";
 
     func(x,rk_int->params, k1);
-    // std::cout<<k1[0]<<" "<<k1[1]<<" "<<k1[2]<<"\n";
     matrix::axpy(k1, x.first, rk_int->step / 2.0,rk_int->sysDim,k2aux);
-    // std::cout<<k2[0]<<" "<<k2[1]<<" "<<k2[2]<<"\n";
 
     func(std::make_pair(k2aux, x.second + rk_int->step / 2.0), rk_int->params,k2);
-    // std::cout<<k2[0]<<" "<<k2[1]<<" "<<k2[2]<<"\n";
 
     matrix::axpy(k2, x.first, rk_int->step / 2.0,rk_int->sysDim,k3aux);
     func(std::make_pair(k3aux, x.second + rk_int->step / 2.0), rk_int->params,k3);
-    // std::cout<<k3[0]<<" "<<k3[1]<<" "<<k3[2]<<"\n";
 
     matrix::axpy(k3, x.first, rk_int->step ,rk_int->sysDim,k4aux);
     func(std::make_pair(k4aux, x.second + rk_int->step), rk_int->params, k4);
-    // std::cout<<k4[0]<<" "<<k4[1]<<" "<<k4[2]<<"\n";
-
-
+    y1.first = new double[rk_int->sysDim];
     for (unsigned int i = 0; i < rk_int->sysDim; i++)
     {
-        y1[i] = x.first[i] + (rk_int->step /6.0) * (k1[i] + 2.0 * k2[i] + 2.0 * k3[i] + k4[i]);
-        // std::cout<<y1[i]<<" ";
+        y1.first[i] = x.first[i] + (rk_int->step /6.0) * (k1[i] + 2.0 * k2[i] + 2.0 * k3[i] + k4[i]);
     }
-    // std::cout<<"\n";
- // free(y1);
-
-    return y1;
-
-    // return y1;
+    y1.second = x.second + rk_int->step;
+    // for (unsigned int i = 0; i < rk_int->sysDim; i++)
+        // std::cout<<y1.first[i]<<'\n';
 } 
 void RK4thSolver::RungeKuttaMethod(void (*func) (std::pair<double*, double>, double*, double*&), std::pair<double*, double> x0, double* param, double t_initial, double t_final, double h, uint dim)
 {
@@ -47,7 +44,6 @@ void RK4thSolver::RungeKuttaMethod(void (*func) (std::pair<double*, double>, dou
 
     rk_int->data = std::vector<std::pair<double*,double>> (rk_int->n_iterations);
     rk_int->data[0] = x0; 
-
     k1    = new double[rk_int->sysDim];
     k2    = new double[rk_int->sysDim]; 
     k3    = new double[rk_int->sysDim];
@@ -55,18 +51,21 @@ void RK4thSolver::RungeKuttaMethod(void (*func) (std::pair<double*, double>, dou
     k2aux = new double[rk_int->sysDim]; 
     k3aux = new double[rk_int->sysDim];
     k4aux = new double[rk_int->sysDim];
+
     for (unsigned int i = 0; i < rk_int->n_iterations-1; i++)
     {
-        rk_int->data[i+1] = std::make_pair(runge_kutta_step(func, rk_int->data[i]), rk_int->data[i].second + h);
+        runge_kutta_step(func, rk_int->data[i], rk_int->data[i+1]);
     }
-    free(k1);
-    free(k2);
-    free(k3);
-    free(k4);
-    free(k2aux);
-    free(k3aux);
-    free(k4aux);
-    free(y1);
+
+    delete[] k1;
+    delete[] k2;
+    delete[] k3;
+    delete[] k4;
+    
+    delete[] k2aux;
+    delete[] k3aux;
+    delete[] k4aux;
+    // delete[] y1;
 
 }
 double* RK45thSolver::runge_kutta_step(void (*func) (std::pair<double*, double>, double*, double*&),std::pair<double*, double> x)
@@ -75,7 +74,6 @@ double* RK45thSolver::runge_kutta_step(void (*func) (std::pair<double*, double>,
     erro.clear();
     erro.resize(rk_int->sysDim);
     y1 = new double[rk_int->sysDim];
-
 
     double* aux = new double[rk_int->sysDim];
     // std::cout<<k1[0]<<" "<<k1[1]<<" "<<k1[2]<<'\n';
@@ -111,8 +109,8 @@ double* RK45thSolver::runge_kutta_step(void (*func) (std::pair<double*, double>,
         erro[i] = ( rk_int->step *(d1*k1[i]+d3*k3[i] + d4*k4[i]+ d5*k5[i]+d6*k6[i])); 
     }
 
-    free(aux);
-  
+    delete[] aux;
+    
     return y1;
 } 
 void RK45thSolver::RungeKuttaMethod(void (*func) (std::pair<double*, double>, double*, double*&), std::pair<double*, double> x0, double* param, double t_initial, double t_final, double h, uint dim)
@@ -133,7 +131,7 @@ void RK45thSolver::RungeKuttaMethod(void (*func) (std::pair<double*, double>, do
     double tol = 1e-8;
     double erroTotal = 0;
     uint i = 0;
-     k1 = new double[rk_int->sysDim];
+    k1 = new double[rk_int->sysDim];
     k2 = new double[rk_int->sysDim]; 
     k3 = new double[rk_int->sysDim];
     k4 = new double[rk_int->sysDim];
@@ -161,16 +159,16 @@ void RK45thSolver::RungeKuttaMethod(void (*func) (std::pair<double*, double>, do
         i++;
         rk_int->data.resize(i+2);   
     }
-    free(k3aux);
-    free(k4aux1);
-    free(k4aux2);
-    free(k6aux);
-    free(k1);
-    free(k2);
-    free(k3);
 
-    free(k4);
-    free(k5);
-    free(k6);
-    free(y1);
+    delete[] k3aux;
+    delete[] k4aux1;
+    delete[] k4aux2;
+    delete[] k6aux;
+    delete[] k1;
+    delete[] k2;
+    delete[] k3;
+    delete[] k4;
+    delete[] k5;
+    delete[] k6;
+    delete[] y1;
 }

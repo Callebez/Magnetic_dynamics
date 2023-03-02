@@ -15,7 +15,7 @@ public:
     double* params;
     uint n_iterations; 
     uint sysDim; 
-
+	
 	void printSolutionDoublePtr(std::string& filename)
 	{
 	    std::fstream plot; 

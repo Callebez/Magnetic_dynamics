@@ -1,8 +1,8 @@
 #pragma once 
-#include "RungeKutta.hpp"
 #include "Solutions.hpp"
 #include "fourier.hpp"
-
+#include "RungeKutta.hpp"
+#include <memory>
 
 class Function
 {
@@ -13,17 +13,18 @@ private:
 protected:
     // std::unique_ptr<Solver> solver; 
 public:
+    std::unique_ptr<Solver> solver;
+    std::unique_ptr<solution<double>> fourier_transform;
+
     double* params = NULL;
-	
     inline uint get_x_dim(){return x_dim;};
 	inline uint get_f_dim(){return f_dim;};
     inline double* get_param(){return params;};
-    // double* (*func) (std::pair<double*, double>, double*) get_func(){return func;};
+    
 	void set_x_dim(uint new_x_dim){x_dim =  new_x_dim;};
 	void set_f_dim(uint new_f_dim){f_dim =  new_f_dim;};
     void set_func(void (*fun) (std::pair<double*, double>, double*, double*&)){func = fun;};
     void set_param(double* param){params = param;};
-    // void set_param(double value, uint pos){params[pos] = value;};
     Function(){;};
     Function(void (*func_) (std::pair<double*, double>, double*,double*&),uint x_dim_,uint f_dim_, double* param_)
     {
@@ -32,6 +33,16 @@ public:
         params = param_;
         func = func_;
     };
+    // ~Function()
+    // {
+    //     for(uint i = 0; i < solver->rk_int->n_iterations; i++)
+    //     {
+    //         delete[] solver->rk_int->data[i].first;
+    //     }
+    //     solver->rk_int->data.clear();
+    //     solver->rk_int.reset(nullptr);
+    //     solver.reset(nullptr);
+    // }
 
     void operator()(std::pair<double*, double> x, double*& res)
     {
@@ -48,12 +59,31 @@ public:
         std::cout<<"dim x: "<< get_x_dim()<<", dim f: "<<get_f_dim()<<std::endl;
         std::cout<<"func: "<<&func;
     };
+   
+   template<class T>
+    void applySolver( std::pair<double*, double> x0, double t_initial, double t_final, double h)
+    {
+        solver = std::make_unique<T>();
+        solver->Method(func,x0,params,t_initial, t_final,h, get_x_dim());
+    };
+   template<class T>
+    void applySolver( std::pair<double*, double> x0, double t_initial, double t_final, double h, std::string& fileName)
+    {
+        solver = std::make_unique<T>();
+        solver->Method(func,x0,params,t_initial, t_final,h, get_x_dim());
+        solver->rk_int->printSolutionDoublePtr(fileName);
+
+    };
+    void applyFourierTransform(double initialFrequency, double finalFrequency, double frquencyStep);
+    // static solution<double*>*  createSignal(function signalFunc, double* params_, double t0_, double tf_, double step_, uint sysDim_);
+
     
     // void applySolver(Solver& solverMethod, double t0, double tf, double step_inicial);
     // virtual void runge_Kutta(std::pair<double*, double> x0, double t_initial, double t_final, double h);
     // virtual void Fourier_Transform(double initialFrequency, double finalFrequency, double frquencyStep);
     
 };
+
 class Lorenz : public Function
 {
 public: 
@@ -69,7 +99,39 @@ public:
     
     /**Differential equation for the Lorenz system **/    
     static void lorenz_equation(std::pair<double*, double>x, double* param, double*& res);
+};
 
+class MagneticDipole : public Function
+{
+public: 
+    /** Constructor **/
+    MagneticDipole(double* param)
+    {
+        // std::cout<<"salve\n";
+        set_param(param);
+        set_func(magenticDipole);
+        set_x_dim(2);
+        set_f_dim(2);
+    };
+    
+    /**Differential equation for the Lorenz system **/    
+    static void magenticDipole(std::pair<double*, double>x, double* param, double*& res);
+};
+class TripleMagneticDipole : public Function
+{
+public: 
+    /** Constructor **/
+    TripleMagneticDipole(double* param)
+    {
+        // std::cout<<"salve\n";
+        set_param(param);
+        set_func(tripleMagenticDipole);
+        set_x_dim(6);
+        set_f_dim(6);
+    };
+    
+    /**Differential equation for the Lorenz system **/    
+    static void tripleMagenticDipole(std::pair<double*, double>x, double* param, double*& res);
 };
 // /**
 //  * @brief Base function for the creation of concret functions. 
@@ -166,7 +228,7 @@ public:
 //  * @param sysDim_ dimension of the signal
 //  * @return solution<double*>* signal
 //  */
-//     static solution<double*>*  createSignal(function signalFunc, double* params_, double t0_, double tf_, double step_, uint sysDim_);
+    // static solution<double*>*  createSignal(function signalFunc, double* params_, double t0_, double tf_, double step_, uint sysDim_);
 
 //     /**
 //      * @brief Function to calculate the Runge Kutta 4th order of a given system of EDOs
