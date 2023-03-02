@@ -5,6 +5,7 @@
 #include <iostream>
 #include <complex>
 #include <cmath>
+#include <memory>
 class matrix
 {
 	private:
@@ -38,7 +39,7 @@ class matrix
 		static double dotProduct(std::vector<double>& v, std::vector<double>& u);
 		static std::vector<double> sub_vectors(std::vector<double>& v, std::vector<double>u);
 		static std::vector<double> sum_vectors(std::vector<double>& v, std::vector<double>u);
-		static double* axpy(double*& x, double*& y, double a, uint size);
+		static void axpy(double*& x,double*& y, double a, uint size,double*& res);
 		static std::vector<double> ax(std::vector<double>& x, double a);
 		static matrix identityMatrix(unsigned int order);
 		static void printMatrixToFile(std::vector<std::pair<std::vector<double>, double>>& matrix, std::string fileName);
