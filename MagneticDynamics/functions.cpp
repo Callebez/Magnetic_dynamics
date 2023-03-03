@@ -57,7 +57,7 @@ void TripleMagneticDipole::tripleMagenticDipole(std::pair<double *, double> x, d
     res[0] = x.first[3];
     res[1] = x.first[4];
     res[2] = x.first[5];
-    res[3] = consts*param[0]*M1*(3.0*sqrt(3.0)*M2*cos(x.first[0]+x.first[1])-3.0*sqrt(3.0)*M3*cos(x.first[0]+x.first[2]) + M2*cos(x.first[1])*sin(x.first[0])+M3*cos(x.first[2])*sin(x.first[0])+5.0*M2*cos(x.first[0])*sin(x.first[0])+ 5.0*M3*cos(x.first[0])*sin(+x.first[2]));
-    res[4] = consts*param[1]*M2*(3.0*sqrt(3.0)*M1*cos(x.first[0]+x.first[1])+ (M1*cos(x.first[0])-8.0*M3*cos(x.first[2]))*sin(x.first[1])+cos(x.first[1])*(5.0*M1*sin(x.first[0]) - 4.0*M3*sin(x.first[3])));
-    res[5] = -consts*param[2]*M3*(3.0*sqrt(3.0)*M1*cos(x.first[0]+x.first[2])+ cos(x.first[2])*(-5.0*M1*sin(x.first[0]) + 4.0*M2*sin(x.first[1]))+sin(x.first[2])*(-M1*cos(x.first[0])+8.0*M2*cos(x.first[1])));
+    res[3] = (-3.0*sqrt(3)*cos(x.first[0] + x.first[1]) + 3.0*sqrt(3)*cos(x.first[0] + x.first[2]) - 5.0*(cos(x.first[1]) + cos(x.first[2]))*sin(x.first[0]) - cos(x.first[0])*(sin(x.first[1]) + sin(x.first[2])))/(36.*sqrt(3.0));
+    res[4] = -(3.0*sqrt(3)*cos(x.first[0] + x.first[1]) + (5.0*cos(x.first[0]) - 4.0*cos(x.first[2]))*sin(x.first[1]) + cos(x.first[1])*(sin(x.first[0]) - 8.0*sin(x.first[2])))/(36.*sqrt(3.0));
+    res[5] = (9.0*cos(x.first[0] + x.first[2]) + sqrt(3.0)*(-(cos(x.first[2])*(sin(x.first[0]) - 8.0*sin(x.first[1]))) + (-5.0*cos(x.first[0]) + 4.0*cos(x.first[1]))*sin(x.first[2])))/108.; 
 }

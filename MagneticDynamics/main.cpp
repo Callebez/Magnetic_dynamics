@@ -93,19 +93,23 @@ int main(void)
 	param[1] = 5e-1;
 	// param[2] = 1.0;
 
-	MagneticDipole fun = MagneticDipole(param);
+	TripleMagneticDipole fun = TripleMagneticDipole(param);
 	std::pair<double*,double > x;
-	std::string MagDipole = "magDipolePI.txt";
+	std::string MagDipole = "tripleDipole.txt";
 
 	// for(uint i = 0; i < 10; i++)
 	// {
-		double* coord = new double[2];
+		double* coord = new double[6];
 
-		coord[0] = ((double) rand() / (RAND_MAX));
-		coord[1] = 0.0;
+		coord[0] = 1.9858035211822733;
+		coord[1] =0.5235987755982988;
+		coord[2] = -0.9386059699856755;
+		coord[3] = 0.0;
+		coord[4] = 0.0;
+		coord[5] = 0.0;
 		x = std::make_pair(coord,0);
-		fun.applySolver<RK4thSolver>(x,0.0,100.0,1e-3,MagDipole);	
-		std::cout<<coord[0]<<'\n';
+		fun.applySolver<RK45thSolver>(x,0.0,1000.0,1e-3,MagDipole);	
+		// std::cout<<coord[0]<<'\n';
 	// }
 	// std::cout<<((double) rand()) / (RAND_MAX)+1<<"\n";
 	// coord[2] = 0.0;
@@ -115,7 +119,7 @@ int main(void)
 
 	// std::pair<double*,double > x = std::make_pair(coord,0);
 	// fun.applySolver<RK4thSolver>(x,0.0,1000.0,1e-3,MagDipole);	
-	delete [] param;
+	// delete [] param;
 
 
 	// free(param);
