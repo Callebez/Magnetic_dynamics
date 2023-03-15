@@ -129,9 +129,12 @@ public:
         set_x_dim(6);
         set_f_dim(6);
     };
+
     
     /**Differential equation for the Lorenz system **/    
     static void tripleMagenticDipole(std::pair<double*, double>x, double* param, double*& res);
+    static void tripleMagenticDipoleAtr(std::pair<double *, double> x, double *param, double *&res);
+
 };
 // /**
 //  * @brief Base function for the creation of concret functions. 

@@ -19,25 +19,29 @@ public:
 	void printSolutionDoublePtr(std::string& filename)
 	{
 	    std::fstream plot; 
-		plot.open(filename,std::fstream::out);
+		std::string file = filename+".txt";
+		plot.open(file,std::fstream::out);
 	
 		for(uint i = 0; i < data.size()-1; i++)
 		{
 			plot<<data[i].second;
 
-			for(uint j = 0; j < sysDim;j++)
+			for(uint j = 0; j < sysDim-1;j++)
 			{
 				plot<<" "<<data[i].first[j];
 			}
 			plot<<"\n";
 		}
+		plot<<"\n\n";
 
 		plot.close();
 	};
 	void printSolutionDouble(std::string& filename)
 	{
 	    std::fstream plot; 
-		plot.open(filename,std::fstream::out);
+		std::string file = filename+".txt";
+
+		plot.open(file,std::fstream::out);
 	
 		for(uint i = 0; i < n_iterations; i++)
 		{

@@ -10,6 +10,8 @@
 #include <cstring>
 #include <GL/glut.h>
 #include <cmath>
+#include <iomanip>
+#include <sstream>
 
 #define PI 3.14159265359
 
@@ -48,17 +50,6 @@ void ClientCode(std::unique_ptr<Solver>& method, void (*func) (std::pair<double*
 {
     method->Method(func,x0,param,t_initial, t_final, h, dim);
 };
-std::unique_ptr<double*> foo()
-{
-	auto v = std::make_unique<double*> ();
-	*v = new double[5];
-	(*v)[0] = 2.0;
-	(*v)[1] = 3.0;
-
-	// std::cout<<*v.get()[1]<<'\n';
-	return std::move(v);
-}
-
 
 // Window size
 const int WIDTH = 640;
@@ -101,29 +92,41 @@ void drawCircle(Circle circle) {
 }
 
 
-// Function to draw an arrow
-
-// Function to update the arrow angle
-double* param = new double[2]{1.0,1.0};
-// param[0] = 1.0;
-// param[1] = 5e-1;
-
+double* param = new double[3]{1.0,1.0,1.0};
 TripleMagneticDipole fun = TripleMagneticDipole(param);
+
 int count = 1;
+int count_speed;
 void updateCircles() {
 
-	count= count + 1;
+	count= count + count_speed;
+	if(count >fun.solver->rk_int->data.size())
+	{
+		count = 0.0;
+	}
+
 	circle1.rangle = (fun.solver->rk_int->data[count-1].first[0]);
 	circle2.rangle = (fun.solver->rk_int->data[count-1].first[1]);
 	circle3.rangle = (fun.solver->rk_int->data[count-1].first[2]);
-	// circle2.rangle += 0.01f;
-	// circle3.rangle += 0.01f;
 }
-// std::cout<<fun.solver->rk_int->data[count].first[2]<<'\n';
-
-// Function to display the scene
 void display() {
     glClear(GL_COLOR_BUFFER_BIT);
+
+	glColor3f (1.0, 1.0, 1.0);
+	glRasterPos2f(-1.0f, 0.9f); //define position on the screen
+
+	// double pi = 3.14159265359;
+	std::stringstream stream;
+	stream << std::fixed << std::setprecision(2) << fun.solver->rk_int->data[count].second;
+	std::string s = stream.str();
+
+	std::string str = "Tempo de simulação: " + s;
+	char *string = new char[str.length()]; 
+	strcpy(string, str.c_str()); 
+		
+	while(*string){
+		glutBitmapCharacter(GLUT_BITMAP_8_BY_13, *string++);
+	}	
 
     // Draw circles
     glColor3f(1.0f, 1.0f, 1.0f);
@@ -131,8 +134,8 @@ void display() {
     drawCircle(circle2);
     drawCircle(circle3);
     glutSwapBuffers();
+	// delete[] string;
 }
-
 // Function to reshape the window
 void reshape(int width, int height) {
     glViewport(0, 0, width, height);
@@ -148,47 +151,112 @@ void reshape(int width, int height) {
 void idle() {
 	// count=0;
     updateCircles();
-    glutPostRedisplay();
-}
 
+	glRasterPos2f(circle1.x, circle1.y);
+	// unsigned char string [] = fun.solver->rk_int->data[count-1].second.c_str();
+	// std::string str = std::to_string(fun.solver->rk_int->data[count-1].second);
+	// const char* string = new char[str.size()];
+	// string = str.c_str();
+	// int len, i;
+	// len = strlen(string);
+	// for (i = 0; i < len; i++) 
+	// {
+	glColor3f(1.0f, 1.0f, 1.0f);
+	glutBitmapCharacter(GLUT_BITMAP_8_BY_13	, fun.solver->rk_int->data[count-1].second);
+	// }	
+    glutPostRedisplay();
+	
+}
+std::string TiraPonto(std::string str)
+{
+	// std::string ponto= ".";
+	// char* ponto = '.';
+	// std::string res=str; 
+	for(uint i = 0; i <str.length(); i++)
+	{
+		// if(str[i]==ponto)
+		std::cout<<str[i];
+	}
+	// return str;
+}
 int main(int argc, char** argv) {
 
 
 	//////////////////////////////////////
-	// double* param = new double[2];
-	// param[0] = 1.0;
-	// param[1] = 1.0;
-	// param[2] = 1.0;
 
-	std::pair<double*,double > x;
-	std::string MagDipole = "tripleDipole.txt";
-	std::string Tripolefourier = "Tripolefourier.txt";
+	// // param[2] = 1.0;
+	// int time;
+	// for(uint i = 0; i < 10; i++)
+	// {
+	// 	double* param = new double[2];
+	// 	param[0] = 0.5; // eps 
+	// 	param[1] = 0.5; // omega 
+	// 	time = i*30 + 10;
+	// 	MagneticDipole fun = MagneticDipole(param);
+	// 	std::pair<double*,double > x;
+	// 	std::string fileName = "Dipolo_Eps_0_5__Omega_0_5_From_0_"+std::to_string(time);
+	// 	std::string fileNameFourier = "Fourier_Dipolo_Eps_0_5__Omega_0_5_From_0_"+std::to_string(time);
+
+	// 	std::string MagDipole = "apresentacao/txts/"+fileName;
+	// 	std::string fourier = "apresentacao/txts/"+fileNameFourier;
+		
+	// 	std::string plotCommand = "plot '" + MagDipole +".txt'"+ " u 1:2 w l lw 3 lc 7 notitle"; 
+	// 	std::string plotCommandFourier = "plot '" + fourier +".txt'"+ " w l lw 2 lc 0 notitle"; 
+		
+	// 	std::string title = "Dipolo magnético na presença de campo magnético \\n constante de frequência de oscilação {/Symbol a}= 0.5";
+	// 	std::string titleFourier = "Transformada de fourier para as frequências de oscilação do Dipolo \\n tempo de integração " + std::to_string(time) ;
+
+	// 	double* coord = new double[2];
+
+	// 	coord[0] = 1.0;
+	// 	coord[1] = 0.0;
+	// 	// coord[2] = -2.094395102393195;
+	// 	// coord[3] = 0.00001;
+	// 	// coord[4] = 0.0;
+	// 	// coord[5] = 0.0;
+
+	// 	x = std::make_pair(coord,0); 
+	// 	fun.applySolver<RK4thSolver>(x,0.0,(double) time,1e-3,MagDipole);
+		
+	// 	plotting::plot2D(fileName,
+	// 					plotCommand,
+	// 					title,
+	// 					"set xlabel \"Tempo característico\" \n set ylabel '{/Symbol q}(t)'");
+	// 	fun.applyFourierTransform(-1.5,1.5, 0.01);
+	// 	fun.fourier_transform->printSolutionDouble(fourier);
+	// 	plotting::plot2D(fileNameFourier,
+	// 					plotCommandFourier, 
+	// 					titleFourier, 
+	// 					"set xlabel \"Frequências\" \n set ylabel 'Amplitudes'");
+
+	// }
+	
 
 	double* coord = new double[6];
 
-	coord[0] = 0.0;
-	coord[1] =2.094395102393195;
+ 	coord[0] = 1.0;
+	coord[1] = 0.0;
 	coord[2] = -2.094395102393195;
-	coord[3] = 0.15;
+	coord[3] = 2.00001;
 	coord[4] = 0.0;
 	coord[5] = 0.0;
-	x = std::make_pair(coord,0);
-	fun.applySolver<RK4thSolver>(x,0.0,100.0,1e-4,MagDipole);
-	std::cout<<fun.solver->rk_int->data[0].first[0];
+	std::pair<double*,double > x;
+	
+	x = std::make_pair(coord,0); 
+	fun.applySolver<RK4thSolver>(x,0.0,100.0,1e-3);
+
+	count_speed = 10;
+
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowSize(640, 480);
-	glutCreateWindow("Three Circles with Arrows");
-		// fun.applyFourierTransform(0,10,0.01);
-		// fun.fourier_transform->printSolutionDouble(Tripolefourier);
-		// std::cout<<coord[0]<<'\n';
-//   glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+	glutCreateWindow("Magnetic Dipoles");
 
-  glutDisplayFunc(display);
-  glutIdleFunc(idle);
+	glutDisplayFunc(display);
+	glutIdleFunc(idle);
 
-  glutMainLoop();
-  return 0;
+	glutMainLoop();
+	return 0;
 }
 
 
