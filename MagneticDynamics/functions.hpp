@@ -3,6 +3,8 @@
 #include "fourier.hpp"
 #include "RungeKutta.hpp"
 #include <memory>
+#include <functional> 
+
 
 class Function
 {
@@ -33,17 +35,6 @@ public:
         params = param_;
         func = func_;
     };
-    // ~Function()
-    // {
-    //     for(uint i = 0; i < solver->rk_int->n_iterations; i++)
-    //     {
-    //         delete[] solver->rk_int->data[i].first;
-    //     }
-    //     solver->rk_int->data.clear();
-    //     solver->rk_int.reset(nullptr);
-    //     solver.reset(nullptr);
-    // }
-
     void operator()(std::pair<double*, double> x, double*& res)
     {
         func(x,params, res);
@@ -70,14 +61,13 @@ public:
     void applySolver( std::pair<double*, double> x0, double t_initial, double t_final, double h, std::string& fileName)
     {
         solver = std::make_unique<T>();
+        // std::cout<<x0.first[0];
         solver->Method(func,x0,params,t_initial, t_final,h, get_x_dim());
         solver->rk_int->printSolutionDoublePtr(fileName);
-
     };
     void applyFourierTransform(double initialFrequency, double finalFrequency, double frquencyStep);
     // static solution<double*>*  createSignal(function signalFunc, double* params_, double t0_, double tf_, double step_, uint sysDim_);
 
-    
     // void applySolver(Solver& solverMethod, double t0, double tf, double step_inicial);
     // virtual void runge_Kutta(std::pair<double*, double> x0, double t_initial, double t_final, double h);
     // virtual void Fourier_Transform(double initialFrequency, double finalFrequency, double frquencyStep);
@@ -117,6 +107,40 @@ public:
     /**Differential equation for the Lorenz system **/    
     static void magenticDipole(std::pair<double*, double>x, double* param, double*& res);
 };
+class MagneticDipoleHarmonic : public Function
+{
+public: 
+    /** Constructor **/
+    MagneticDipoleHarmonic(double* param)
+    {
+        // std::cout<<"salve\n";
+        set_param(param);
+        set_func(magneticDipoleHarmonic);
+        set_x_dim(2);
+        set_f_dim(2);
+    };
+    
+    /**Differential equation for the Lorenz system **/    
+    static void magneticDipoleHarmonic(std::pair<double*, double>x, double* param, double*& res);
+};
+class MagneticDipoleDuffing : public Function
+{
+public: 
+    /** Constructor **/
+    MagneticDipoleDuffing(double* param)
+    {
+        // std::cout<<"salve\n";
+        set_param(param);
+        set_func(magneticDipoleDuffing);
+        set_x_dim(2);
+        set_f_dim(2);
+    };
+    
+    /**Differential equation for the Lorenz system **/    
+    static void magneticDipoleDuffing(std::pair<double*, double>x, double* param, double*& res);
+};
+
+
 class TripleMagneticDipole : public Function
 {
 public: 

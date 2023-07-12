@@ -2,8 +2,8 @@
 
 matrix::matrix(uint nrows, uint ncolumns)
 {
-    double ** m = new double*[rows];
-    if(rows)
+    double ** m = new double*[nrows];
+    if(nrows)
     {
         m[0] = new double[nrows*ncolumns];
         for (uint i = 1; i < nrows; ++i)
@@ -225,6 +225,11 @@ double matrix::distance(std::vector<double>& v, std::vector<double>& u)
 // }
 void matrix::axpy(double*& x, double*& y, double a, uint size,double*& res )
 {	
+
+	// std::transform(x, x+size, res, [&](int val){return a*x[val]+y[val];});
+	// std::cout<<"salve!";
+    // std::transform(x, x+size, res, [&](int val) { return a*x[val]+y[val]; });
+
 	for (unsigned int i = 0; i < size; i++)
 	{
 		res[i] = a * x[i] + y[i];
@@ -260,7 +265,7 @@ matrix matrix::identityMatrix(unsigned int order)
 	{
 		for (unsigned int j = 0; j < order; j++)
 		{
-			id.data[i][j] = 0;
+			id.data[i][j] = 0.0;
 		}
 		id.data[i][i] = 1;
 	}

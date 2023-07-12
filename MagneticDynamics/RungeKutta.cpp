@@ -1,15 +1,7 @@
 #include "RungeKutta.hpp"
 void RK4thSolver::runge_kutta_step(void (*func) (std::pair<double*, double>, double*, double*&),std::pair<double*, double> x,std::pair<double*, double>& y1 )
 {
-    // auto y1 = std::make_unique<std::vector<double>>(new double[rk_int->sysDim]);
-    // y1->resize(rk_int->sysDim);
-	// std::unique_ptr<double*> y1 = std::make_unique<double*> ();
-
-	// *y1 = new double[rk_int->sysDim];
-    // double* y1 = new double[rk_int->sysDim];
-//    for (unsigned int j = 0; j < rk_int->sysDim; j++)
-//             std::cout<<"x"<<j<<": " <<x.first[j]<<"\n";
-
+ 
     func(x,rk_int->params, k1);
     matrix::axpy(k1, x.first, rk_int->step / 2.0,rk_int->sysDim,k2aux);
 
@@ -26,8 +18,37 @@ void RK4thSolver::runge_kutta_step(void (*func) (std::pair<double*, double>, dou
         y1.first[i] = x.first[i] + (rk_int->step /6.0) * (k1[i] + 2.0 * k2[i] + 2.0 * k3[i] + k4[i]);
     }
     y1.second = x.second + rk_int->step;
+
+    // double a = rk_int->step / 2.0;
+    // func(x,rk_int->params, k1);
+    // // std::transform(k1, k1+rk_int->sysDim, x.first, k2aux, [a](double x_i, double y_i) {return a * x_i + y_i;});
+    
+    // // std::transform(k1, k1+rk_int->sysDim, k2aux, [&](int val){return (rk_int->step / 2.0)*k1[val]+ x.first[val];});
+    // matrix::axpy(k1, x.first, rk_int->step / 2.0,rk_int->sysDim,k2aux);
+
+    // func(std::make_pair(k2aux, x.second + rk_int->step / 2.0), rk_int->params,k2);
+
+    // matrix::axpy(k2, x.first, rk_int->step / 2.0,rk_int->sysDim,k3aux);
+    // // std::transform(k2, k2+rk_int->sysDim, k3aux, [&](int val){return (rk_int->step / 2.0)*k2[val]+ x.first[val];});
+    // // std::transform(k2, k2+rk_int->sysDim, x.first, k3aux, [a](double x_i, double y_i) {return a * x_i + y_i;});
+
+    // func(std::make_pair(k3aux, x.second + rk_int->step / 2.0), rk_int->params,k3);
+
+    // matrix::axpy(k3, x.first, rk_int->step ,rk_int->sysDim,k4aux);
+    // double b = rk_int->step;
+    // // std::transform(k3, k3+rk_int->sysDim, x.first, k4aux, [b](double x_i, double y_i) {return b * x_i + y_i;});
+
+    // // std::transform(k3, k3+rk_int->sysDim, k4aux, [&](int val){return (rk_int->step / 2.0)*k3[val]+ x.first[val];});
+
+    // func(std::make_pair(k4aux, x.second + rk_int->step), rk_int->params, k4);
+    // y1.first = new double[rk_int->sysDim];
     // for (unsigned int i = 0; i < rk_int->sysDim; i++)
-        // std::cout<<y1.first[i]<<'\n';
+    // {
+    //     y1.first[i] = x.first[i] + (rk_int->step /6.0) * (k1[i] + 2.0 * k2[i] + 2.0 * k3[i] + k4[i]);
+    // }
+    // y1.second = x.second + rk_int->step;
+    // // for (unsigned int i = 0; i < rk_int->sysDim; i++)
+    //     // std::cout<<y1.first[i]<<'\n';
 } 
 void RK4thSolver::RungeKuttaMethod(void (*func) (std::pair<double*, double>, double*, double*&), std::pair<double*, double> x0, double* param, double t_initial, double t_final, double h, uint dim)
 {
@@ -44,6 +65,7 @@ void RK4thSolver::RungeKuttaMethod(void (*func) (std::pair<double*, double>, dou
 
     rk_int->data = std::vector<std::pair<double*,double>> (rk_int->n_iterations);
     rk_int->data[0] = x0; 
+    // std::cout<<rk_int->x0[0].first[0]<<"\n";
     k1    = new double[rk_int->sysDim];
     k2    = new double[rk_int->sysDim]; 
     k3    = new double[rk_int->sysDim];
@@ -52,7 +74,7 @@ void RK4thSolver::RungeKuttaMethod(void (*func) (std::pair<double*, double>, dou
     k3aux = new double[rk_int->sysDim];
     k4aux = new double[rk_int->sysDim];
 
-    for (unsigned int i = 0; i < rk_int->n_iterations-1; i++)
+    for(unsigned int i = 0; i < rk_int->n_iterations-1; i++)
     {
         runge_kutta_step(func, rk_int->data[i], rk_int->data[i+1]);
     }

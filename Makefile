@@ -1,7 +1,7 @@
 target 	:= main 
 objs 	:= ./build/main.o ./build/functions.o ./build/matrices.o ./build/plotting.o ./build/integration.o ./build/RungeKutta.o ./build/fourier.o 
 CC 		:= clang++
-CFLAGS 	:= -lglut -lGLU -lGL #-fsanitize=address
+CFLAGS 	:= -lglut -lGLU -lGL 	
 # ASAN := verbosity=1:malloc_context_size=20 
 
 all: $(target)

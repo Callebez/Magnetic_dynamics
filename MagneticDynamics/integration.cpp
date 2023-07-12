@@ -14,4 +14,4 @@ std::complex<double> integration::simpsonOneThird(std::vector<std::complex<doubl
         sum += f[2 * i]* 2.0;
     }
     return sum*h/3.0;
-}
+}   

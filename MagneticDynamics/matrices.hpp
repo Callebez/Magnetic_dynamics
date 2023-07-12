@@ -6,19 +6,22 @@
 #include <complex>
 #include <cmath>
 #include <memory>
+#include <algorithm>
+#include <functional>
 class matrix
 {
 	private:
 		unsigned int rows = 0, columns = 0;
-		double** data;
 		// std::vector<std::vector<double>> data;
 
 	public:
+		double** data;
 
 		matrix(unsigned int nrows, unsigned int ncolumns);
 		
 		unsigned int get_rows();
 		unsigned int get_columns();
+		double** get_data(){return data;};
 		double get_value(unsigned int row_position, unsigned int column_position);
 		
 		void set_rows(unsigned int new_nrows);

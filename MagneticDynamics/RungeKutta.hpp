@@ -3,6 +3,8 @@
 #include "matrices.hpp"
 // #include "functions.hpp"
 #include "Solutions.hpp"
+#include <functional>
+#include <algorithm>
 /**I'm using the factory method to create a Runge Kutta object using 
  * different implementations of Runge Kutta Methods.**/
 
@@ -32,6 +34,7 @@ public:
 
     void Method(void (*func) (std::pair<double*, double>, double*, double*&), std::pair<double*, double> x0, double* param, double t_initial, double t_final, double h, uint dim)   
     {
+        // std::cout<<x0.first[0]<<'\n';
         RungeKuttaMethod(func, x0,  param, t_initial, t_final, h, dim);
     }
     ~Solver()
@@ -43,6 +46,7 @@ public:
         rk_int->data.clear();
         // rk_int.reset(nullptr);    
     };
+    // ~Solver()=default;
 };
 
 class RK4thSolver: public Solver

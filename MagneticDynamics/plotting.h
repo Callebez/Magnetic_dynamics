@@ -6,7 +6,6 @@ class plotting
 {
 public:
 	static void plot3D(const char* outputFile, const char* inputFile, const char* graphTitle, const char* usingLines);
-	static void plot2D(std::string outputFile, std::string inputFile, std::string graphTitle, const char* optionalCommands);
-
+	static void plot2D(std::string outputFile, std::string plotCommand, std::string graphTitle, const char* optionalCommands);
 };
 

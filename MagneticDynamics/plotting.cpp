@@ -19,9 +19,10 @@
 void  plotting::plot2D(std::string outputFile, std::string plotCommand, std::string graphTitle, const char* optionalCommands)
 {
 	FILE* gnupipe = popen("gnuplot -persist", "w");
+
 	if (gnupipe)
 	{
-		fprintf(gnupipe, "set terminal png enhanced size 1080,720 font \"Times-New-Roman,16\"\n\n");
+		fprintf(gnupipe, "set encoding utf8 \n\n set terminal png enhanced size 1080,720 font \"Times-New-Roman,16\"\n\n");
 		fprintf(gnupipe, "set title font \'Times-New-Roman,24\' \n\n");
 		fprintf(gnupipe, "set title \"%s\" \n\n ", graphTitle.c_str());
 		
@@ -31,7 +32,7 @@ void  plotting::plot2D(std::string outputFile, std::string plotCommand, std::str
 		fprintf(gnupipe, "set border lw 2 \n \n");
 		fprintf(gnupipe, "set grid \n\n");
 		// fprintf(gnupipe, "set key noautotitle \n\n");
-		fprintf(gnupipe, "set output \'./apresentacao/images/%s.png\' \n\n",outputFile.c_str());
+		fprintf(gnupipe, "set output \'./Omega/images/%s.png\' \n\n",outputFile.c_str());
 		fprintf(gnupipe, "%s\n", optionalCommands); 
 		fprintf(gnupipe, "%s\n", plotCommand.c_str());
 	}

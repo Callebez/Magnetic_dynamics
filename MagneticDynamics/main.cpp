@@ -92,22 +92,20 @@ void drawCircle(Circle circle) {
 }
 
 
-double* param = new double[3]{1.0,1.0,1.0};
-TripleMagneticDipole fun = TripleMagneticDipole(param);
 
 int count = 1;
 int count_speed;
 void updateCircles() {
 
 	count= count + count_speed;
-	if(count >fun.solver->rk_int->data.size())
-	{
-		count = 0.0;
-	}
+	// if(count >fun.solver->rk_int->data.size())
+	// {
+	// 	count = 0.0;
+	// }
 
-	circle1.rangle = (fun.solver->rk_int->data[count-1].first[0]);
-	circle2.rangle = (fun.solver->rk_int->data[count-1].first[1]);
-	circle3.rangle = (fun.solver->rk_int->data[count-1].first[2]);
+	// circle1.rangle = (fun.solver->rk_int->data[count-1].first[0]);
+	// circle2.rangle = (fun.solver->rk_int->data[count-1].first[1]);
+	// circle3.rangle = (fun.solver->rk_int->data[count-1].first[2]);
 }
 void display() {
     glClear(GL_COLOR_BUFFER_BIT);
@@ -117,7 +115,7 @@ void display() {
 
 	// double pi = 3.14159265359;
 	std::stringstream stream;
-	stream << std::fixed << std::setprecision(2) << fun.solver->rk_int->data[count].second;
+	// stream << std::fixed << std::setprecision(2) << fun.solver->rk_int->data[count].second;
 	std::string s = stream.str();
 
 	std::string str = "Tempo de simulação: " + s;
@@ -162,7 +160,7 @@ void idle() {
 	// for (i = 0; i < len; i++) 
 	// {
 	glColor3f(1.0f, 1.0f, 1.0f);
-	glutBitmapCharacter(GLUT_BITMAP_8_BY_13	, fun.solver->rk_int->data[count-1].second);
+	// glutBitmapCharacter(GLUT_BITMAP_8_BY_13	, fun.solver->rk_int->data[count-1].second);
 	// }	
     glutPostRedisplay();
 	
@@ -171,19 +169,333 @@ std::string TiraPonto(std::string str)
 {
 	// std::string ponto= ".";
 	// char* ponto = '.';
-	// std::string res=str; 
+	std::string res=str; 
 	for(uint i = 0; i <str.length(); i++)
 	{
 		// if(str[i]==ponto)
 		std::cout<<str[i];
 	}
-	// return str;
+	return res;
 }
-int main(int argc, char** argv) {
+void magneticDipoleJacoian(std::pair<double*, double> x, double* param, matrix& res)
+{
+	res.set_value(0,0,0);
+	res.set_value(0,1,1);
+	res.set_value(1,0,-cos(x.first[0]+param[0]*sin(param[1]*x.second))) ;
+	res.set_value(1,1,0);
+}
+// void magneticDipoleJacoian(std::pair<double*, double> x, double* param, matrix& res)
+// {
+// 	res.set_value(0,0,0);
+// 	res.set_value(0,1,1);
+// 	res.set_value(1,0,-cos(x.first[0]+param[0]*sin(param[1]*x.second))) ;
+// 	res.set_value(1,1,0);
+// }
+double step;
+void lorenzJacobian(std::pair<double*, double> x, double* param, matrix& res)
+{
+	// double step = 1e-4;
+    res.set_value(0,0,-param[0]*step+1.0); 
+    res.set_value(0,1, param[0]*step);
+    res.set_value(0,2, 0.0); 
+    res.set_value(1,0,-x.first[2]*step + param[1]*step);
+    res.set_value(1,1,-step+1.0);
+    res.set_value(1,2,-x.first[0]*step);
+    res.set_value(2,0,x.first[1]*step);
+    res.set_value(2,1,x.first[0]*step);
+    res.set_value(2,2,1.0-(param[2])*step);   
+}
+void dipoleJacobian(std::pair<double*, double> x, double* param, matrix& res)
+{
+	// double step = 1e-4;
+    res.set_value(0,0, 1.0); 
+    res.set_value(0,1, -step);
+    res.set_value(1,0, step*cos(x.first[0] - param[0]*sin(param[1]*x.second))); 
+    res.set_value(1,1, 1.0); 
+}
+void normalize(double* x, int size)
+{
+  double norm = 0;
+  for(uint i = 0; i < size;i++)
+  {
+    norm += x[i]*x[i];
+  }
+  norm = sqrt(norm);
+  for(uint i = 0; i < size;i++)
+  {
+    x[i] = x[i]/norm;
+  }
+}
+void gramSchmidtNormal(double**& vectors, int size) {
+    int n = size;
+    for (int i = 0; i < n; i++) {
+        // Normalize the i-th vector
+        normalize(vectors[i],size);
+        // Orthogonalize the i-th vector against the previous ones
+        for (int j = 0; j < i; j++) {
+            double dotProduct = 0;
+            for (int k = 0; k < n; k++) {
+                dotProduct += vectors[i][k] * vectors[j][k];
+            }
+            for (int k = 0; k < n; k++) {
+                vectors[i][k] -= dotProduct * vectors[j][k];
+            }
+        }
+    }
+}
+void gramSchmidt(double**& vectors, int size) {
+    int n = size;
+    for (int i = 0; i < n; i++) {
+        // Normalize the i-th vector
+        // normalize(vectors[i],size);
+        // Orthogonalize the i-th vector against the previous ones
+        for (int j = 0; j < i; j++) {
+            double dotProduct = 0;
+            for (int k = 0; k < n; k++) {
+                dotProduct += vectors[i][k] * vectors[j][k];
+            }
+            for (int k = 0; k < n; k++) {
+                vectors[i][k] -= dotProduct * vectors[j][k];
+            }
+        }
+    }
+}
+double normOf(double*& x, int size)
+{
+	double norm = 0;
+	for(uint i = 0; i < size; i++)
+	{
+		norm+=x[i]*x[i];
+	}
+	return sqrt(norm);
+}
+void printD(double*& x, int size)
+{
+  for(uint i = 0; i < size; i++)
+  {
+    std::cout<< x[i]<< " ";
+  }
+  std::cout<<"\n";
+}
+double dotProd(double*& x,double*& y, int size)
+{
+  double d= 0;
+  for(uint i=0; i < size; i++)
+  {
+    d += x[i]*y[i];
+  }
+  return d;
+}
+void orthTester(double**& vectors, int size)
+{
+  for(uint i = 0; i < size-1; i++)
+  {
+    if(abs(dotProd(vectors[i],vectors[i+1],size))> 1e-10)
+    {
+      std::cout<<"deu ruim bb\n Resultado: " <<dotProd(vectors[i],vectors[i+1],size);
+    }
+  }
+  std::cout<<"sucesso porra!\n";
+}
+
+std::vector<double> lyapunovExp(std::unique_ptr<solution<double*>>& rk_int, double* param)
+{
+	uint dim = rk_int->get_sysDim();
+    std::vector<double> lyapunovExponents (dim,0);
+    matrix w = matrix::identityMatrix(dim);  
+    matrix J = matrix::identityMatrix(dim);
+	// printD(rk_int->params,3);
+    for(uint i = 0; i < rk_int->n_iterations; i++)
+    {
+        dipoleJacobian(rk_int->data[i], param, J);
+        w = matrix::mult_matrix(J,w);
+		w.transpose();
+        gramSchmidt(w.data,dim);
+	
+        for(uint j = 0; j < lyapunovExponents.size(); j++)
+        {
+            lyapunovExponents[j] +=  std::log(normOf(w.data[j],w.get_columns()));
+        }    
+
+        gramSchmidtNormal(w.data,dim);
+		w.transpose();
+	
+    }
+	// std::cout<<lyap<<"\n"; 
+	// // J.print_matrix();
+    for(uint j = 0; j < dim; j++)
+    {
+        lyapunovExponents[j] = lyapunovExponents[j]/(rk_int->data.back().second);
+		// std::cout<< lyapunovExponents[j]<<" ";
+    }
+	// std::cout<<"\n";
+	// std::cout<<"tempo: "<<rk_int->data.back().second<<"\n";
+
+	return lyapunovExponents;
+}
+void searchMaxMin(std::vector<std::vector<double>>& bifurcation,std::vector<double>& xCoord, std::vector<double>::iterator& paramValue)
+{
+
+        for(int i = 0; i < (int)xCoord.size()-1; i++)
+        {
+            if((xCoord[i-1]<xCoord[i]) & (xCoord[i]>xCoord[i+1]))
+            {
+                bifurcation[1].push_back(xCoord[i]);
+                bifurcation[0].push_back((double)(*paramValue));
+            }
+            else if((xCoord[i]<xCoord[i-1]) & (xCoord[i]< xCoord[i+1]))
+            {
+                bifurcation[3].push_back(xCoord[i]);
+                bifurcation[2].push_back((double)(*paramValue));
+            }
+        }
+}
+std::vector<std::vector<double>> bifurcationSingleDipole(double* initParam, uint initParamSize, uint coordParam,
+											 double paramRange[2], double paramStep, double* initialConditions,
+											 uint coordBeingAnalysed, double timeIntegration, double stepIntegraiton,
+											 int systemDimension)
+{
+
+    int paramIterations = (int)((fabs(paramRange[1]-paramRange[0])/paramStep));    
+
+    std::vector<std::vector<double>> bifurcation (4);
+
+    std::vector<double> param (paramIterations,0);
+    std::vector<double>::iterator paramValue;
+    std::vector<double> xCoord;
+    for(int i = 0; i < paramIterations; i++)
+    {
+        param[i] = paramRange[0] + i*paramStep;
+    } 
+
+    for(paramValue = param.begin(); paramValue<param.end(); paramValue++)
+    {
+		double* param = new double[initParamSize]; 
+		for(uint i = 0; i < initParamSize; i++)
+		{
+			param[i] = initParam[i];
+		}
+		param[coordParam] = *paramValue;
+	
+		MagneticDipole fun = MagneticDipole(param);
+		double* coord = new double[systemDimension];
+		for(uint i = 0; i < initParamSize; i++)
+		{
+			coord[i] = initialConditions[i];
+		}
+		std::pair<double*,double> x = std::make_pair(coord,0);
+		std::string integrationCheck = "./outputs/txt/integrationCheck.txt";
+	    std::ofstream output1;
+		fun.applySolver<RK4thSolver>(x,0.0,timeIntegration,stepIntegraiton,integrationCheck);
+		output1.open(integrationCheck);
+		output1<<"\n";
+        xCoord.resize(fun.solver->rk_int->get_n_iterations());
+		output1.close();
+
+        for(uint i = 0; i< fun.solver->rk_int->get_n_iterations(); i++)
+        {
+            xCoord[i] = fun.solver->rk_int->data[i].first[coordBeingAnalysed];
+        }
+        searchMaxMin(bifurcation,xCoord, paramValue);           
+    }
+    return bifurcation;
+}
+std::vector<std::vector<double>> bifurcationTripleDipole(double* initParam, uint initParamSize, uint coordParam,
+											 double paramRange[2], double paramStep, double* initialConditions,
+											 uint coordBeingAnalysed, double timeIntegration, double stepIntegraiton,
+											 int systemDimension)
+{
+
+    int paramIterations = (int)((fabs(paramRange[1]-paramRange[0])/paramStep));    
+
+    std::vector<std::vector<double>> bifurcation (4);
+
+    std::vector<double> param (paramIterations,0);
+    std::vector<double>::iterator paramValue;
+    std::vector<double> xCoord;
+    for(int i = 0; i < paramIterations; i++)
+    {
+        param[i] = paramRange[0] + i*paramStep;
+    } 
+
+    for(paramValue = param.begin(); paramValue<param.end(); paramValue++)
+    {
+		double* param = new double[initParamSize]; 
+		for(uint i = 0; i < initParamSize; i++)
+		{
+			param[i] = initParam[i];
+		}
+		param[coordParam] = *paramValue;
+		TripleMagneticDipole fun = TripleMagneticDipole(param);
+		double* coord = new double[systemDimension];
+		for(uint i = 0; i < initParamSize; i++)
+		{
+			coord[i] = initialConditions[i];
+		}
+		std::pair<double*,double> x = std::make_pair(coord,0);
+
+		fun.applySolver<RK4thSolver>(x,0.0,timeIntegration,stepIntegraiton);
+        xCoord.resize(fun.solver->rk_int->get_n_iterations());
+
+        for(uint i = 0; i< fun.solver->rk_int->get_n_iterations(); i++)
+        {
+            xCoord[i] = fun.solver->rk_int->data[i].first[coordBeingAnalysed];
+        }
+        searchMaxMin(bifurcation,xCoord, paramValue);           
+
+    }
+    return bifurcation;
+}
+void printBifucationToFile(std::vector<std::vector<double>>& matrix, std::string fileName)
+{
+    std::ofstream output1;
+    std::ofstream output2;
+
+    std::string file1 = "./outputs/txt/";
+    file1 = file1 + fileName + "max.dat";
+    
+    std::string file2 = "./outputs/txt/";
+    file2 = file2 + fileName + "min.dat";
+    output1.open(file1);
+    output2.open(file2);
+    for(uint i = 0; i < 2; i++)
+    {
+        for(uint j = 0; j < matrix[0].size(); j++)
+        {
+            output1<<matrix[0][j]<<" "<< matrix[1][j] <<"\n";
+            output2<<matrix[2][j]<<" "<< matrix[3][j] <<"\n";
+
+        }
+        output1<<" ";
+        output2<<" ";
+
+    }
+    output1.close();
+    output2.close();
+}
+// void searchMaxMin(std::vector<std::vector<double>>& bifurcation,std::vector<double>& xCoord, std::vector<double>::iterator& paramValue)
+// {
+
+//         for(int i = 0; i < (int)xCoord.size()-1; i++)
+//         {
+//             if((xCoord[i-1]<xCoord[i]) & (xCoord[i]>xCoord[i+1]))
+//             {
+//                 bifurcation[1].push_back(xCoord[i]);
+//                 bifurcation[0].push_back((double)(*paramValue));
+//             }
+//             else if((xCoord[i]<xCoord[i-1]) & (xCoord[i]< xCoord[i+1]))
+//             {
+//                 bifurcation[3].push_back(xCoord[i]);
+//                 bifurcation[2].push_back((double)(*paramValue));
+//             }
+//         }
+// }
+
+
+int main() {
 
 
 	//////////////////////////////////////
-
 	// // param[2] = 1.0;
 	// int time;
 	// for(uint i = 0; i < 10; i++)
@@ -196,28 +508,21 @@ int main(int argc, char** argv) {
 	// 	std::pair<double*,double > x;
 	// 	std::string fileName = "Dipolo_Eps_0_5__Omega_0_5_From_0_"+std::to_string(time);
 	// 	std::string fileNameFourier = "Fourier_Dipolo_Eps_0_5__Omega_0_5_From_0_"+std::to_string(time);
-
 	// 	std::string MagDipole = "apresentacao/txts/"+fileName;
-	// 	std::string fourier = "apresentacao/txts/"+fileNameFourier;
-		
+	// 	std::string fourier = "apresentacao/txts/"+fileNameFourier;	
 	// 	std::string plotCommand = "plot '" + MagDipole +".txt'"+ " u 1:2 w l lw 3 lc 7 notitle"; 
-	// 	std::string plotCommandFourier = "plot '" + fourier +".txt'"+ " w l lw 2 lc 0 notitle"; 
-		
+	// 	std::string plotCommandFourier = "plot '" + fourier +".txt'"+ " w l lw 2 lc 0 notitle"; 	
 	// 	std::string title = "Dipolo magnético na presença de campo magnético \\n constante de frequência de oscilação {/Symbol a}= 0.5";
 	// 	std::string titleFourier = "Transformada de fourier para as frequências de oscilação do Dipolo \\n tempo de integração " + std::to_string(time) ;
-
 	// 	double* coord = new double[2];
-
 	// 	coord[0] = 1.0;
 	// 	coord[1] = 0.0;
 	// 	// coord[2] = -2.094395102393195;
 	// 	// coord[3] = 0.00001;
 	// 	// coord[4] = 0.0;
 	// 	// coord[5] = 0.0;
-
 	// 	x = std::make_pair(coord,0); 
 	// 	fun.applySolver<RK4thSolver>(x,0.0,(double) time,1e-3,MagDipole);
-		
 	// 	plotting::plot2D(fileName,
 	// 					plotCommand,
 	// 					title,
@@ -228,34 +533,208 @@ int main(int argc, char** argv) {
 	// 					plotCommandFourier, 
 	// 					titleFourier, 
 	// 					"set xlabel \"Frequências\" \n set ylabel 'Amplitudes'");
+	// }
+		// double* coord = new double[6];
+ 	// coord[0] = 1.0;
+	// coord[1] = 0.0;
+	// coord[2] = -2.094395102393195;
+	// coord[3] = 2.00001;
+	// coord[4] = 0.0;
+	// coord[5] = 0.0;
+	// std::pair<double*,double > x;
+	// x = std::make_pair(coord,0); 
+	// fun.applySolver<RK4thSolver>(x,0.0,100.0,1e-3);
+	// fun.applyFourierTransform(0,10.0,0.01);
+	// count_speed = 10;
+	// glutInit(&argc, argv);
+	// glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
+	// glutInitWindowSize(640, 480);
+	// glutCreateWindow("Magnetic Dipoles");
+	// glutDisplayFunc(display);
+	// glutIdleFunc(idle);
+	// glutMainLoop();
+	// std::pair<double*,double > x;
 
+	
+	std::string plotCommand = "plot 'outputs/txt/testeAproximacao.dat' u 1:2 pt 7 ps 0.5 notitle"; 
+	std::string outputFileName = "Grafico";
+	std::string SingleDip = "outputs/txt/omega0_75_eps0_5_t200";
+	std::string fourierFile ="outputs/txt/fourier/omega0_75";
+	
+	uint dim = 2;
+	step = 5e-2;
+
+	// double eps = 0.5;
+	// double omega = 0.75;
+	// double* paramSingleDipole = new double[dim]{eps,omega};
+	// MagneticDipole singleDipole = MagneticDipole(paramSingleDipole);
+	// double* coord = new double[dim]{1.0,0.0};
+	// std::pair<double*,double> x = std::make_pair(coord,0);	
+	// singleDipole.applySolver<RK4thSolver>(x,0,200,step,SingleDip);
+
+	/////////////////////// Frequency bifurcations
+	std::fstream filteredFrequencies; 
+	std::string  filteredFrequenciesFile= "outputs/txt/a.txt";
+	filteredFrequencies.open(filteredFrequenciesFile,std::fstream::out);
+	for(uint j =0; j <100; j++)
+	{
+		double eps = 0.5;
+		double omega = 3.0 - j*0.06;
+		double* paramSingleDipole = new double[dim]{eps,omega};//{10.0,28.0,8.0/3.0};
+		MagneticDipole singleDipole = MagneticDipole(paramSingleDipole);
+		double* coord = new double[dim]{1.0,0.0};//{19.0,20.0,50.0};
+		std::pair<double*,double> x = std::make_pair(coord,0);	
+		singleDipole.applySolver<RK4thSolver>(x,0,500,step);
+		singleDipole.applyFourierTransform(-5.0,5.0,0.05);
+		std::vector<std::pair<double,double>> res;
+		// singleDipole.fourier_transform->printSolutionDouble(fourierFile);
+		singleDipole.fourier_transform->filter(res,0.2);
+		for(uint i = 0; i < res.size(); i++)
+		{
+			filteredFrequencies<<omega<<" ";
+			filteredFrequencies<<res[i].second;
+			filteredFrequencies<<" "<<res[i].first;
+			filteredFrequencies<<"\n";
+		}
+	}
+	filteredFrequencies.close();	
+	// /////////////////////////////////////////////////////////////////////////////
+
+	////////////////////////  Validation for the fourier transform
+	// uint n = 10000;
+	// std::unique_ptr<solution<double*>> signal= std::make_unique<solution<double*>>();
+	// signal->data = std::vector<std::pair<double*,double>> (n); 
+	// signal->n_iterations = n;
+	// signal->step = 0.01;
+	// signal->params = nullptr;
+	// signal->t0 = 0.0;
+	// signal->tf = 0.01*n;
+	// for(uint i = 0; i < n; i++)
+	// {	
+	// 	signal->data[i].first = new double[1];
+	// 	signal->data[i].first[0] = sin(3.0*i*0.01)/2.0 + sin(5*i*0.01)/5.0+sin(7*i*0.01)/10.;
+	// 	signal->data[i].second = i*0.01;
+	// }
+	// std::unique_ptr<fourier> F = std::make_unique<fourier>();   
+    // F->fourierFrequencySpectrumAbsoluteValue(signal,0,10,0.01);
+    // std::unique_ptr<solution<double>> fourier_transform = F->get_FrequencySpectrum();
+	// std::string testFourier = "outputs/txt/testeFourier.txt";
+	// fourier_transform->printSolutionDouble(testFourier);
+	////////////////////////////////////////////////////////////////////////////////
+
+
+	// std::vector<std::vector<double>> bifSingleDipole = bifurcationSingleDipole(paramSingleDipole, 2, 1, 
+														// pRange, paramStep,coord, 0, 200, step, dim);
+	// printBifucationToFile(bifSingleDipole,"SingleDipole");
+	// plotting::plot2D(SingleDip,plotCommand," "," ");
+	// std::string MagDipoleHarm = "Omega/txts/Dip_Atr_eps_0_5_w_0_75_Harmonic_Oscilator";
+	// funHarm.applySolver<RK4thSolver>(xHarm,0.0,100.0,5e-4,MagDipoleHarm);	
+	// std::string MagDipoleDuff = "Omega/txts/Dip_Atr_eps_0_5_w_0_75_Duffing_Equation";
+	// funDuff.applySolver<RK4thSolver>(xDuff,0.0,100.0,5e-4,MagDipoleDuff);	
+
+	// double w = 0.0;
+	// for(uint j = 0; j< 1; j++)
+	// {
+	// 	for(int i = -50; i < 50; i ++)
+	// 		{
+	// 			double* param = new double[dim]{1.0,100.85};//{10.0,28.0,8.0/3.0};
+	// 			MagneticDipole fun = MagneticDipole(param);
+	// 			double* coord = new double[dim]{0.0+i*0.5,0.0};//{19.0,20.0,50.0};
+	// 			std::pair<double*,double> x = std::make_pair(coord,0);
+	// 			fun.applySolver<RK4thSolver>(x,0.0,100.0,5e-3,MagDipole);	
+	// 		}
 	// }
 	
-
-	double* coord = new double[6];
-
- 	coord[0] = 1.0;
-	coord[1] = 0.0;
-	coord[2] = -2.094395102393195;
-	coord[3] = 2.00001;
-	coord[4] = 0.0;
-	coord[5] = 0.0;
-	std::pair<double*,double > x;
 	
-	x = std::make_pair(coord,0); 
-	fun.applySolver<RK4thSolver>(x,0.0,100.0,1e-3);
 
-	count_speed = 10;
+	// std::vector<double> l(dim);
+	// for(uint i = 0; i < iterations; i++)
+	// {
+	// 	// double* param = new double[dim]{10.0,28.0,8.0/3.0};
+	// 	double* param = new double[3]{1.0,1.0,1.0};
+	// 	param[1] = w+i*step;
+	// 	TripleMagneticDipole fun = TripleMagneticDipole(param);
+	// 	double* coord = new double[dim]{1.0,0.0,0.0,0.0,0.0,0.0};
+	// 	std::pair<double*,double> x = std::make_pair(coord,0);
 
-	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
-	glutInitWindowSize(640, 480);
-	glutCreateWindow("Magnetic Dipoles");
+	// 	fun.applySolver<RK4thSolver>(x,0.0,10.0,step,MagDipole);	
+	// 	// std::cout<<x.first[0]<<"\n";
+	// 	l= lyapunovExp(fun.solver->rk_int,param);
+	// 	// std::cout<<w<<"\n";
+	// 	plot<<param[1];
 
-	glutDisplayFunc(display);
-	glutIdleFunc(idle);
+	// 	for(uint j = 0; j < dim;j++)
+	// 	{
+	// 		plot<<" "<<l[j];
+	// 	}
+	// 	plot<<"\n";
+	// 	// w+=1.0;
+	// }
+	// plot<<"\n\n";
 
-	glutMainLoop();
+	// plot.close();
+
+
+	// double* paramR = new double[2]{0.,5.};
+	// std::vector<std::vector<double>> bif = bifurcation(paramR,0.01,0,2);
+	// std::string bifFile=  "bifFileMagDip";
+	// printBifucationToFile(bif,bifFile);
+	
+	// for(uint i = 0; i < dim; i++)
+	// {
+	// 	std::cout<<l[i]<<" ";
+	// }
+
+	// fun.applyFourierTransform(-1.5,1.5, 0.01);
+
+	// fun.fourier_transform->printSolutionDouble(fourier);
+	// plotting::plot2D(fileName,
+	// 				plotCommand,
+	// 				title,
+	// 				"set xlabel \"Tempo característico\" \n set ylabel 'q(t)'");
+	// plotting::plot2D(fileNameFourier,
+	// 				plotCommandFourier, 
+	// 				titleFourier, 
+	// 				"set xlabel \"Frequências\" \n set ylabel 'Amplitudes'");
+
+    // std::vector<long double> lyapunovExponents (dim,0);
+ 
+    // matrix w = matrix::identityMatrix(dim);  
+    // matrix J = matrix::identityMatrix(dim);
+  
+    // for(uint i = 0; i < fun.solver->rk_int->n_iterations; i++)
+    // {
+	// 	// w=matrix::identityMatrix(dim);
+    //     //runge kutta does the evolution of the system 
+    //     std::pair<double*,double> X1 = fun.solver->rk_int->data[i];
+
+    //     //the jacobian times the matrix makes the vectors in w align with the directions 
+    //     //of the eigenvectors  
+
+    //     magneticDipoleJacoian(X1, param, J);
+    //     w = matrix::mult_matrix(J,w);
+
+	// 	gramSchmidt(w.data,w.get_columns());
+  
+    //     for(uint j = 0; j < lyapunovExponents.size(); j++)
+    //     {
+    //         lyapunovExponents[j] +=  log(normOf(w.data[j],dim));
+    //     }    
+    //     gramSchmidtNormal(w.data,dim);
+	// 	w.print_matrix();
+    // }
+    // for(uint j = 0; j < dim; j++)
+    // {
+    //     lyapunovExponents[j] = lyapunovExponents[j]/ 100.0;
+    // }
+	// for(uint j = 0; j < dim; j++)
+    // {
+    //     std::cout<<lyapunovExponents[j]<<" ";
+    // }
+	// std::cout<<"\n";
+
+  
+
 	return 0;
 }
 

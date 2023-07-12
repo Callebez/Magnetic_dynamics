@@ -19,20 +19,20 @@ public:
 	void printSolutionDoublePtr(std::string& filename)
 	{
 	    std::fstream plot; 
-		std::string file = filename+".txt";
+		std::string file = filename+".dat";
 		plot.open(file,std::fstream::out);
 	
-		for(uint i = 0; i < data.size()-1; i++)
+		for(uint i = 0; i < data.size(); i++)
 		{
 			plot<<data[i].second;
 
-			for(uint j = 0; j < sysDim-1;j++)
+			for(uint j = 0; j < sysDim;j++)
 			{
 				plot<<" "<<data[i].first[j];
 			}
 			plot<<"\n";
 		}
-		plot<<"\n\n";
+		plot<<"\n\n\n";
 
 		plot.close();
 	};
@@ -50,7 +50,37 @@ public:
 			plot<<"\n";
 		}
 		plot.close();
+
 	};
+	void filter(std::vector<std::pair<double,double>>& res, double frequencyTreshold)
+	{
+		std::vector<std::pair<double,double>> aux; 
+
+		for(uint i = 1; i < data.size()-1; i++)
+		{
+			if((data[i-1].first  < data[i].first )&& (data[i].first  > data[i+1].first ))
+			{
+				aux.emplace_back(data[i]);
+			}
+		}
+		std::pair<double,double> max = aux[0];
+		for(uint i = 1; i < aux.size(); i++)
+		{
+			if(max.first < aux[i].first)
+			{
+				max = aux[i];
+			}
+		}
+		for(uint i = 0; i < aux.size(); i++)
+		{
+			if(aux[i].first/max.first > frequencyTreshold)
+			{
+				res.emplace_back(aux[i]);
+			}
+		}
+
+	};
+	~solution()=default; 
 	inline double get_t0(){return t0;};
 	inline double get_tf(){return tf;};
 	inline double get_step(){return step;};
